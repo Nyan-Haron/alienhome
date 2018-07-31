@@ -1,0 +1,234 @@
+body {
+    font-family: sans-serif;
+}
+#body {
+    margin: 0 auto;
+    width: 900px;
+}
+#link {
+    margin-bottom: 20px;
+    margin-left: 11px;
+}
+#link input[type=submit] {
+    width: 95px;
+}
+#header {
+    height: 100px;
+}
+#caption {
+    float: left;
+}
+#authInfo {
+    width: 230px;
+    float: right;
+    margin-top: 19px;
+}
+#logOut {
+    float: right;
+}
+
+.game {
+    margin: 10px 0;
+    padding: 10px;
+    border: 2px solid;
+}
+.gamePolls {
+    float: right;
+    margin-top: 14px;
+}
+.boost {
+    background-color: #c1f6ff;
+}
+.agree {
+    background-color: #c1ffc1;
+}
+.disagree {
+    background-color: #ffc1c1;
+}
+.think {
+    background-color: #ffffff;
+}
+.complete {
+    background-color: #ffefc1;
+}
+div.game {
+    width: 262px;
+    height: 200px;
+    margin: 7px;
+    float: left;
+}
+.gameTitle {
+    display: block;
+    margin-top: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.gameTitle span {
+    font-size: 20px;
+}
+.gameDate {
+    font-size: 12px;
+    display: block;
+    float: right;
+}
+.status {
+    display: block;
+    margin-top: 15px;
+}
+.pollTimes {
+    font-size: 12px;
+    display: block;
+    float: left;
+}
+h3 {
+    margin-left: 7px;
+}
+.comm {
+    display: block;
+    margin-top: 7px;
+    width: 262px;
+    height: 90px;
+}
+img {
+    font-size: 12px;
+}
+.boostButton {
+    display: block;
+    float: right;
+}
+.buttonDiv {
+
+}
+.upButt {
+    width: 20px;
+    height: 20px;
+    margin-left: 7px;
+    margin-bottom: -4px;
+}
+.downButt {
+    width: 20px;
+    height: 20px;
+    margin-left: 7px;
+    margin-bottom: -4px;
+}
+#sub {
+    float: bottom;
+}
+.starValue {
+    font-size: 11px;
+    margin: -8px 0 0 -2px;
+    position: absolute;
+}
+.star {
+    width: 20px;
+    height: 20px;
+}
+.starNvalue {
+    float: right;
+    margin: 0 5px 0 5px;
+}
+.starChar {
+    font-size: 20px;
+    margin-top: -5px;
+}
+
+.gameEditBlock {
+    display: block;
+    float: left;
+    margin: 10px;
+    width: 250px;
+}
+.gameEditBlock * {
+    margin: 2px;
+}
+.gameEditBlock input {
+    width: 246px;
+}
+.gameEditBlock select {
+    width: 252px;
+}
+.gameEditBlock div.saveButton input[type=submit] {
+    width: 254px;
+    margin-left: -1px;
+}
+#loginLink {
+    display: block;
+    position: absolute;
+    width: 262px;
+    height: 142px;
+    margin: 157px 0 0 322px;
+}
+.gameEditBlock textarea {
+    font-family: sans-serif;
+    font-size: 12px;
+    height: 45px;
+    width: 246px;
+    resize: none;
+}
+
+#kitty {
+  width: 80px;
+  height: 80px;
+  float: right;
+  opacity: 0;
+}
+#kitty:hover {
+  opacity: 1;
+}
+
+.userEditBlock {
+    display: block;
+    float: left;
+    margin: 10px;
+    width: 250px;
+    border: 1px solid grey;
+}
+.userEditBlock * {
+    margin: 2px;
+}
+.userEditBlock span {
+    display: block;
+}
+.userEditBlock input[type=text] {
+    width: 246px;
+}
+.userEditBlock input[type=checkbox] {
+    float: right;
+}
+.userEditBlock div.saveButton input[type=submit] {
+    width: 248px;
+    margin-left: -1px;
+}
+
+.targetVariant {
+    width: 775px;
+    height: 50px;
+    border: 1px solid grey;
+    margin: 5px;
+    position: relative;
+    float: left;
+}
+.targetProgress {
+    height: 100%;
+    position: absolute;
+    background-color: #c1ffff;
+    z-index: 1;
+}
+.targetVariantProgress {
+    position: absolute;
+    background-color: #c1ffc1;
+}
+.targetVariantDescription {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    margin-top: 15px;
+}
+.targetVariantAdvance {
+    margin-left: 5px;
+    float: left;
+}
+.targetVariantTitle {
+    float: left;
+}
