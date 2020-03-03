@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
-<h1>/index/index.html here!</h1>
-</body>
-</html>
+<form action="/order_game">{{gameOrderForm}}</form>
+<details>
+    <summary>История статусов</summary>
+    <table id="historyTable">
+        <tr><th>Игра</th><th>Статус</th><th>Дата</th></tr>
+        {{statusHistoryTableContent}}
+    </table>
+</details>
+{{games}}

@@ -51,6 +51,12 @@ body {
 .complete {
     background-color: #ffefc1;
 }
+.game.revived {
+  background-image: url("/img/reviveWatermark.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
 div.game {
     width: 262px;
     height: 200px;
@@ -231,4 +237,23 @@ img {
 }
 .targetVariantTitle {
     float: left;
+}
+
+.statusTitle {
+  font-weight: bold;
+  font-size: 16px;
+}
+details {
+  margin-top: 15px;
+}
+summary {
+  cursor: pointer;
+}
+#historyTable {
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+#historyTable td {
+  border: 1px solid grey;
+  padding: 5px;
 }

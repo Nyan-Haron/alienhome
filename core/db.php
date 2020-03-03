@@ -18,6 +18,7 @@ class Db
           $conf->getDbPwd(),
           $conf->getDbName()
         );
+        mysqli_set_charset($this->conn, 'utf8');
     }
 
     /**

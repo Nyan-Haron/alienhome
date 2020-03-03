@@ -9,6 +9,8 @@ class Conf
     private $dbPwd = '';
     private $dbName = '';
     private $env = 'prod';
+    private $twitchAppClientId = '';
+    private $twitchAppSecret = '';
 
     public function __construct($mode = 'prod')
     {
@@ -20,13 +22,12 @@ class Conf
             ini_set('display_errors', 1);
         }
 
-        $dbHost = $dbUser = $dbPwd = $dbName = '';
-        $env = 'prod';
-
         require_once $this->getPath('/conf.php');
+        $conf = getBaseConf();
 
-        $this->setDb($dbHost, $dbUser, $dbPwd, $dbName);
-        $this->setEnv($env);
+        $this->setDb($conf['dbHost'], $conf['dbUser'], $conf['dbPwd'], $conf['dbName']);
+        $this->setEnv($conf['env']);
+        $this->setTwitchApp($conf['twitchAppClientId'], $conf['twitchAppSecret']);
     }
 
     private function setPublicFolder($publicFolder)
@@ -101,9 +102,31 @@ class Conf
     public function devPrint($name = '', $var)
     {
         if ($this->getEnv() == 'dev') {
-            printf('<p>%s:</p><pre>', $name);
+            printf('<p>%s<pre>', $name);
             var_dump($var);
-            print '</pre>';
+            print '</pre></p>';
         }
+    }
+
+    private function setTwitchApp($twitchAppClientId, $twitchAppSecret)
+    {
+        $this->twitchAppClientId = $twitchAppClientId;
+        $this->twitchAppSecret = $twitchAppSecret;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTwitchAppClientId()
+    {
+        return $this->twitchAppClientId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTwitchAppSecret()
+    {
+        return $this->twitchAppSecret;
     }
 }
