@@ -12,6 +12,8 @@ class authController extends baseController
     {
         $this->request->setViewVariable('page', 'Authentication');
         $this->request->setViewVariable('header', '');
+        $this->request->setViewVariable('clientId', $this->conf->getTwitchAppClientId());
+        $this->request->setViewVariable('redirectUri', $this->conf->getAuthRedirectUri());
     }
 
     public function auth()

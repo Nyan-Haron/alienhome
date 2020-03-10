@@ -11,6 +11,7 @@ class Conf
     private $env = 'prod';
     private $twitchAppClientId = '';
     private $twitchAppSecret = '';
+    private $authRedirectUri = '';
 
     public function __construct($mode = 'prod')
     {
@@ -24,6 +25,7 @@ class Conf
 
         require_once $this->getPath('/conf.php');
         $conf = getBaseConf();
+        $this->authRedirectUri = $conf['authRedirectUri'];
 
         $this->setDb($conf['dbHost'], $conf['dbUser'], $conf['dbPwd'], $conf['dbName']);
         $this->setEnv($conf['env']);
@@ -128,5 +130,13 @@ class Conf
     public function getTwitchAppSecret()
     {
         return $this->twitchAppSecret;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthRedirectUri()
+    {
+        return $this->authRedirectUri;
     }
 }
