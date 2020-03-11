@@ -17,6 +17,7 @@ body {
 }
 #caption {
     float: left;
+    /*color: red;*/
 }
 #authInfo {
     width: 230px;
@@ -27,11 +28,15 @@ body {
     float: right;
 }
 
+/* ========== tile style ============*/
+
 .game {
     margin: 10px 0;
     padding: 10px;
     border: 2px solid;
 }
+
+/*===================================*/
 .gamePolls {
     float: right;
     margin-top: 14px;
@@ -57,6 +62,8 @@ body {
   background-repeat: no-repeat;
   background-size: contain;
 }
+
+/*============ title and in-title styles ==============*/
 div.game {
     width: 262px;
     height: 200px;
@@ -139,6 +146,8 @@ img {
     margin-top: -5px;
 }
 
+/*========== admin page styles ==========*/
+
 .gameEditBlock {
     display: block;
     float: left;
@@ -206,6 +215,8 @@ img {
     width: 248px;
     margin-left: -1px;
 }
+
+/*============================================*/
 
 .targetVariant {
     width: 775px;
