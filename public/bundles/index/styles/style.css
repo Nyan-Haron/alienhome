@@ -63,13 +63,24 @@ body {
   background-size: contain;
 }
 
-/*============ title and in-title styles ==============*/
+/*============ tile and in-tile styles ==============*/
 div.game {
     width: 262px;
     height: 200px;
     margin: 7px;
     float: left;
 }
+
+/*@media (max-width: 910px) {*/
+/*    div#boost {*/
+/*        display: flex;*/
+/*    }*/
+/*}*/
+
+/*div#boost {*/
+/*    display: grid;*/
+/*    grid-template-columns: repeat(3, 1fr);*/
+/*}*/
 .gameTitle {
     display: block;
     margin-top: 20px;
