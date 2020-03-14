@@ -63,7 +63,7 @@ body {
   background-size: contain;
 }
 
-/*============ tile and in-tile styles ==============*/
+/*============ tile styles ==============*/
 div.game {
     width: 262px;
     height: 200px;
@@ -74,13 +74,16 @@ div.game {
 /*@media (max-width: 910px) {*/
 /*    div#boost {*/
 /*        display: flex;*/
+/*        flex-direction: column;*/
 /*    }*/
 /*}*/
 
 /*div#boost {*/
-/*    display: grid;*/
-/*    grid-template-columns: repeat(3, 1fr);*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
 /*}*/
+
+/*================ in-tile styles ===================*/
 .gameTitle {
     display: block;
     margin-top: 20px;
@@ -155,6 +158,82 @@ img {
 .starChar {
     font-size: 20px;
     margin-top: -5px;
+}
+
+/*====================== tile styles phone and tablet media =========================*/
+
+@media screen and (max-width: 1000px) {
+    #body {
+        display: grid;
+        grid-template-rows: auto;
+        grid-template-columns: auto;
+        grid-template-areas:
+            /*"title"*/
+            /*"login"*/
+            /*"suggest"*/
+            "header"
+            "history"
+            "boost"
+            "agree"
+            "think"
+            "complete"
+            "disagree";
+        margin: 0 auto;
+        width: 100%;
+    }
+    /*details * {*/
+    /*    visibility: hidden;*/
+    /*}*/
+    /*h1#caption {*/
+    /*    grid-area: title;*/
+    /*}*/
+    /*div#authInfo {*/
+    /*    grid-area: login;*/
+    /*    justify-self: start;*/
+    /*}*/
+    form {
+        visibility: hidden;
+    }
+    div#header {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        width: auto;
+        flex-wrap: wrap;
+    }
+    #header > h1 {
+        margin: 0.5em 0 0.3em 0;
+    }
+    #authInfo {
+        margin: 0;
+    }
+    #logOut {
+        margin: 0;
+        float: left;
+    }
+    #historyTable {
+        grid-area: history;
+        visibility: hidden;
+    }
+    div#boost, div#agree, div#think, div#complete, div#disagree {
+        display: flex;
+        flex-direction: column;
+    }
+    div#boost {
+        grid-area: boost;
+    }
+    div#agree {
+        grid-area: agree;
+    }
+
+    div.game {
+        width: auto;
+        height: 4em;
+        margin: 0.1em;
+    }
+    div.game > .comm {
+        visibility: hidden;
+    }
 }
 
 /*========== admin page styles ==========*/
