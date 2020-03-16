@@ -161,36 +161,12 @@ img {
 }
 
 /*====================== tile styles phone and tablet media =========================*/
+/*upd march 15: grid doesn't fit nicely -- eliminated*/
+/*for further development: purge the styles of all the child elements of game blocks; find out how to scale for the phone screen;
+set all individual game blocks as flex containers*/
 
-@media screen and (max-width: 1000px) {
-    #body {
-        display: grid;
-        grid-template-rows: auto;
-        grid-template-columns: auto;
-        grid-template-areas:
-            /*"title"*/
-            /*"login"*/
-            /*"suggest"*/
-            "header"
-            "history"
-            "boost"
-            "agree"
-            "think"
-            "complete"
-            "disagree";
-        margin: 0 auto;
-        width: 100%;
-    }
-    /*details * {*/
-    /*    visibility: hidden;*/
-    /*}*/
-    /*h1#caption {*/
-    /*    grid-area: title;*/
-    /*}*/
-    /*div#authInfo {*/
-    /*    grid-area: login;*/
-    /*    justify-self: start;*/
-    /*}*/
+@media screen and (max-width: 910px) {
+
     form {
         visibility: hidden;
     }
@@ -210,20 +186,16 @@ img {
     #logOut {
         margin: 0;
         float: left;
+        /*width: 100%;*/
+        visibility: visible;
     }
     #historyTable {
         grid-area: history;
-        visibility: hidden;
     }
     div#boost, div#agree, div#think, div#complete, div#disagree {
         display: flex;
         flex-direction: column;
-    }
-    div#boost {
-        grid-area: boost;
-    }
-    div#agree {
-        grid-area: agree;
+        width: 96vw;
     }
 
     div.game {
@@ -232,6 +204,7 @@ img {
         margin: 0.1em;
     }
     div.game > .comm {
+        display: block;
         visibility: hidden;
     }
 }
