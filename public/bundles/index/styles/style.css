@@ -161,20 +161,31 @@ img {
 }
 
 /*====================== tile styles phone and tablet media =========================*/
-/*upd march 15: grid doesn't fit nicely -- eliminated*/
-/*for further development: purge the styles of all the child elements of game blocks; find out how to scale for the phone screen;
-set all individual game blocks as flex containers*/
+/*upd march 17: find out how to restrict scaling; dependent on extra output?
+for further development: starnvalue and boost button are fucked up - fix this*/
 
-@media screen and (max-width: 910px) {
+@media (max-width: 910px) {
+
+    body {
+        width: 100vw;
+    }
+
+    body > p {
+        visibility: hidden;
+    }
+
+    body > pre {
+        visibility: hidden;
+    }
 
     form {
-        visibility: hidden;
+        width: 95vw;
     }
     div#header {
         display: flex;
         flex-direction: column;
         height: auto;
-        width: auto;
+        width: 95vw;
         flex-wrap: wrap;
     }
     #header > h1 {
@@ -190,12 +201,12 @@ set all individual game blocks as flex containers*/
         visibility: visible;
     }
     #historyTable {
-        grid-area: history;
+        visibility: hidden;
     }
     div#boost, div#agree, div#think, div#complete, div#disagree {
         display: flex;
         flex-direction: column;
-        width: 96vw;
+        width: 95vw;
     }
 
     div.game {
