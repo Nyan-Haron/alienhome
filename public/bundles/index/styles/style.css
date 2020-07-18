@@ -160,27 +160,23 @@ img {
     margin-top: -5px;
 }
 
-/*====================== tile styles phone and tablet media =========================*/
-/*upd march 17: find out how to restrict scaling; dependent on extra output?
-for further development: starnvalue and boost button are fucked up - fix this*/
+/*=== tile styles phone and tablet media ===*/
 
 @media (max-width: 910px) {
 
     body {
         width: 100vw;
+        padding: 5px;
     }
 
-    body > p {
-        visibility: hidden;
+    .headForm {
+      width: 95vw;
     }
 
-    body > pre {
-        visibility: hidden;
+    .headForm > span {
+      word-wrap: break-word;
     }
 
-    form {
-        width: 95vw;
-    }
     div#header {
         display: flex;
         flex-direction: column;
@@ -200,16 +196,21 @@ for further development: starnvalue and boost button are fucked up - fix this*/
         /*width: 100%;*/
         visibility: visible;
     }
-    #historyTable {
+    /* #historyTable {
         visibility: hidden;
-    }
+    } */
     div#boost, div#agree, div#think, div#complete, div#disagree {
-        display: flex;
-        flex-direction: column;
+        display: block;
         width: 95vw;
+        margin-left: 0;
     }
 
-    div.game {
+    details > #historyTable {
+      width: 95vw;
+      margin-left: 0;
+    }
+
+    /* div.game {
         width: auto;
         height: 4em;
         margin: 0.1em;
@@ -217,7 +218,7 @@ for further development: starnvalue and boost button are fucked up - fix this*/
     div.game > .comm {
         display: block;
         visibility: hidden;
-    }
+    } */
 }
 
 /*========== admin page styles ==========*/
