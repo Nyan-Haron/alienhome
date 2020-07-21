@@ -158,6 +158,8 @@ img {
 
     .headForm {
       width: 90vw;
+      margin-top: 15px;
+      margin-bottom: 40px;
     }
 
     .headForm > span {
@@ -166,6 +168,14 @@ img {
 
     .headForm > input[type='text'] {
       width: 90vw;
+    }
+
+    .headForm > input[type='submit'] {
+      float: right;
+    }
+
+    .headForm > a {
+      float: left !important;
     }
 
     div#header {
