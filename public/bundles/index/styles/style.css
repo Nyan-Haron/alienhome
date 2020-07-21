@@ -70,19 +70,6 @@ div.game {
     margin: 7px;
     float: left;
 }
-
-/*@media (max-width: 910px) {*/
-/*    div#boost {*/
-/*        display: flex;*/
-/*        flex-direction: column;*/
-/*    }*/
-/*}*/
-
-/*div#boost {*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*}*/
-
 /*================ in-tile styles ===================*/
 .gameTitle {
     display: block;
@@ -166,22 +153,26 @@ img {
 
     body {
         width: 100vw;
-        padding: 5px;
+        padding: 1vw;
     }
 
     .headForm {
-      width: 95vw;
+      width: 90vw;
     }
 
     .headForm > span {
       word-wrap: break-word;
     }
 
+    .headForm > input[type='text'] {
+      width: 90vw;
+    }
+
     div#header {
         display: flex;
         flex-direction: column;
         height: auto;
-        width: 95vw;
+        width: 90vw;
         flex-wrap: wrap;
     }
     #header > h1 {
@@ -196,29 +187,37 @@ img {
         /*width: 100%;*/
         visibility: visible;
     }
-    /* #historyTable {
-        visibility: hidden;
-    } */
+
     div#boost, div#agree, div#think, div#complete, div#disagree {
         display: block;
-        width: 95vw;
+        width: 90vw;
         margin-left: 0;
+        margin-right: 1vw;
     }
 
     details > #historyTable {
-      width: 95vw;
+      width: 90vw;
       margin-left: 0;
     }
 
-    /* div.game {
-        width: auto;
-        height: 4em;
+    div.game {
+        width: 90vw;
+        height: auto;
         margin: 0.1em;
     }
-    div.game > .comm {
-        display: block;
-        visibility: hidden;
-    } */
+
+    .comm {
+      width: auto;
+      height: auto;
+    }
+
+    div.game > .comm, div.game > .buttonDiv {
+        display: none;
+    }
+
+    .game.revived {
+      background-position: left center;
+    }
 }
 
 /*========== admin page styles ==========*/

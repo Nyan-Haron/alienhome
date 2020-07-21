@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>BioAlienR {{page}}</title>
     <link rel="stylesheet" type="text/css" href="/bundles/index/styles/style.css">
+
 </head>
 
 <body>
@@ -12,5 +13,43 @@
     {{header}}
     {{body}}
 </div>
+
+<script type="text/javascript">
+  // ты спросишь "что это за богомерзкая хуйня??!"
+  // а я нежно прошепчу - "спизженный код"
+
+  let g = document.getElementById('boost');
+  let boostLength = g.childElementCount - 1;
+  let g2 = document.getElementById('agree');
+  let agreeLength = g2.childElementCount - 1;
+  let g3 = document.getElementById('think');
+  let thinkLength = g3.childElementCount - 1;
+  let g4 = document.getElementById('complete');
+  let completeLength = g4.childElementCount - 1;
+  let g5 = document.getElementById('disagree');
+  let disagreeLength = g5.childElementCount - 1;
+
+  function unfoldThis(g2, length) {
+  for (let i = 0, len = g2.children.length; i < len; i++)
+  {
+
+      (function(index){
+          g2.children[i].onclick = function(){
+                document.getElementsByClassName('comm')[index + length].style.display = "block";
+                document.getElementsByClassName('buttonDiv')[index + length].style.display = "block";
+          }
+      })(i);
+
+  }
+}
+
+  unfoldThis(g, 0);
+  unfoldThis(g2, boostLength);
+  unfoldThis(g3, boostLength+agreeLength);
+  unfoldThis(g4, boostLength+agreeLength+thinkLength);
+  unfoldThis(g5, boostLength+agreeLength+thinkLength+completeLength);
+
+</script>
+
 </body>
 </html>
