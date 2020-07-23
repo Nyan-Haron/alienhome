@@ -19,22 +19,22 @@
   // а я нежно прошепчу - "спизженный код"
 
   let g = document.getElementById('boost');
-  let boostLength = g.childElementCount - 1;
+  let boostLength;
   let g2 = document.getElementById('agree');
-  let agreeLength = g2.childElementCount - 1;
+  let agreeLength;
   let g3 = document.getElementById('think');
-  let thinkLength = g3.childElementCount - 1;
+  let thinkLength;
   let g4 = document.getElementById('complete');
-  let completeLength = g4.childElementCount - 1;
+  let completeLength;
   let g5 = document.getElementById('disagree');
-  let disagreeLength = g5.childElementCount - 1;
+  let disagreeLength;
 
-  function unfoldThis(g2, length) {
-  for (let i = 0, len = g2.children.length; i < len; i++)
+  function unfoldThis(g, length) {
+  for (let i = 0, len = g.children.length; i < len; i++)
   {
 
       (function(index){
-          g2.children[i].onclick = function(){
+          g.children[i].onclick = function(){
             if (window.matchMedia("(max-width: 910px)").matches) {
               /* The viewport is less than, or equal to, 700 pixels wide */
               let x = document.getElementsByClassName('comm')[index + length].style.display;
@@ -46,19 +46,17 @@
                 document.getElementsByClassName('buttonDiv')[index + length].style.display = "none";
               }
             }
-                // document.getElementsByClassName('comm')[index + length].style.display = "block";
-                // document.getElementsByClassName('buttonDiv')[index + length].style.display = "block";
           }
       })(i);
 
   }
 }
 
-  unfoldThis(g, 0);
-  unfoldThis(g2, boostLength);
-  unfoldThis(g3, boostLength+agreeLength);
-  unfoldThis(g4, boostLength+agreeLength+thinkLength);
-  unfoldThis(g5, boostLength+agreeLength+thinkLength+completeLength);
+  if (g != null) {unfoldThis(g, 0); boostLength = g.childElementCount - 1;} else {boostLength = 0;}
+  if (g2 != null) {unfoldThis(g2, boostLength); agreeLength = g2.childElementCount - 1;} else {agreeLength = 0;}
+  if (g3 != null) {unfoldThis(g3, boostLength+agreeLength); thinkLength = g3.childElementCount - 1;} else {thinkLength = 0;}
+  if (g4 != null) {unfoldThis(g4, boostLength+agreeLength+thinkLength); completeLength = g4.childElementCount - 1;} else {completeLength = 0;}
+  if (g5 != null) {unfoldThis(g5, boostLength+agreeLength+thinkLength+completeLength); disagreeLength = g5.childElementCount - 1;} else {disagreeLength = 0;}
 
 </script>
 
