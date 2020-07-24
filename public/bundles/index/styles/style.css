@@ -156,6 +156,11 @@ img {
         padding: 1vw;
     }
 
+    .authImage {
+      width: 60vw !important;
+      margin-left: 15vw !important;
+    }
+
     .headForm {
       width: 90vw;
       margin-top: 15px;
