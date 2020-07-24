@@ -156,7 +156,7 @@ img {
         padding: 1vw;
     }
 
-    .authImage {
+    .authImage, #loginLink {
       width: 60vw !important;
       margin-left: 15vw !important;
     }
