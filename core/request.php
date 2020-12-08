@@ -7,7 +7,7 @@ class Request
         '/auth' => 'index/auth/auth',
         '/login' => 'index/auth/index',
         '/logout' => 'index/auth/logout',
-        '/cron' => 'index/index/cron',
+        '/lk' => 'index/lk/index'
     ];
 
     public $get = [];
@@ -24,7 +24,6 @@ class Request
         $this->post = $_POST;
         $request = explode('?', $requestUri)[0];
 
-        var_dump($request);
         $this->checkPath($request);
     }
 

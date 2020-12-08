@@ -104,6 +104,7 @@ class indexController extends baseController
             if ($statusesArr[$game['status_id']]['code'] == 'boost') $boostedGames++;
         }
 
+        $gameTile = file_get_contents($this->conf->getPath("$htmlPath/gameTile.html"));
         $games = '';
         foreach ($gamesArr as $statusId => $statusedGames) {
             $groupStatus = $statusesArr[$statusId];
@@ -115,6 +116,7 @@ class indexController extends baseController
 
             if ($groupStatus['code'] == 'boost') $games .= '<details ' . $open . '><summary><span class="statusTitle">' . $groupStatus['title'] . ' ('.$boostedGames.'/'.$maxBoost.')</span></summary><div id="' . $groupStatus['code'] . '">';
             else $games .= '<details ' . $open . '><summary><span class="statusTitle">' . $groupStatus['title'] . '</span></summary><div id="' . $groupStatus['code'] . '">';
+
             foreach ($statusedGames as $game) {
                 if ($game['author_id'] == $this->authInfo['id']) {
                     $ownage = 'ourGame';
@@ -145,16 +147,18 @@ class indexController extends baseController
 
                 $statusCode = $gameStatus['code'];
                 if ($game['is_revived']) $statusCode .= ' revived';
-                $games .= '<div class="game ' . $statusCode . ' ' . $ownage . '">
-            <span class="gameDate">' . date("Y-m-d", $game['order_date']) . '</span>
-            <span class="pollTimes">В опросах: ' . $game['poll_count'] . ' раз(а)</span>
-            <span class="gamePolls"></span>
-            <span class="gameTitle"><span title="' . $game['title'] . '">' . $game['title'] . '</span>
-              <br>by ' . $game['author_name'] . '</span>
-            <p class="comm">Коммент: ' . (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']) . '</p>
-            <div class="buttonDiv">' . $star . $boostButton . $reviveButton . '</div>
-          </div>
-      ';
+                $games .= $this->request->renderLayout($gameTile, [
+                    'statusCode' => $statusCode,
+                    'ownage' => $ownage,
+                    'gameDate' => date("Y-m-d", $game['order_date']),
+                    'pollCount' => $game['poll_count'],
+                    'title' => $game['title'],
+                    'authorName' => $game['author_name'],
+                    'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
+                    'star' => $star,
+                    'boostButton' => $boostButton,
+                    'reviveButton' => $reviveButton
+                ]);
             }
 
             $games .= '<div style="clear: both"></div></div></details>';
@@ -250,8 +254,4 @@ class indexController extends baseController
         header("Location: /");
     }
 
-    public function cron()
-    {
-        include_once '../cron/checkSubs.php';
-    }
 }

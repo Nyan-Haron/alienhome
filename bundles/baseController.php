@@ -83,15 +83,15 @@ class baseController
             return $_SESSION['sub'];
         }
 
-        if ($this->isAuth && $this->authInfo['id'] == '82304594') {
-//        if ($this->isAuth && $this->authInfo['id'] == '40955336') {
+//        if ($this->isAuth && $this->authInfo['id'] == '82304594') { // Харон
+        if ($this->isAuth && $this->authInfo['id'] == '40955336') { // Илья
             $token = $this->authInfo['authToken'];
             $this->conf->devPrint("authInfo", $this->authInfo);
             $cursor = '';
             $tries = 0;
             do {
-                $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=82304594&after=$cursor");
-//            $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=40955336&after=$cursor");
+//                $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=82304594&after=$cursor");
+                $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=40955336&after=$cursor");
                 curl_setopt(
                     $subCheck,
                     CURLOPT_HTTPHEADER,

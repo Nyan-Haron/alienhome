@@ -1,8 +1,11 @@
 <div id="header">
     <h1 id="caption">BioAlienR Home Page</h1>
     <div id="authInfo">
-        <span>You are logged in as <span id="auth_username" data-id="{{userId}}">{{userName}}</span></span>
+        <span>You are logged in as <a href="/lk" id="auth_username" data-id="{{userId}}">{{userName}}</a></span>
         {{subCheck}}
-        <form id="logOut" action="/logout"><input type="submit" value="logout" /></form>
+        <form id="logOut">
+            <input type="hidden" name="logout" value="logout" />
+            <input type="submit" value="logout" />
+        </form>
     </div>
 </div>
