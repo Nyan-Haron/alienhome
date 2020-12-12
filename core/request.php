@@ -7,6 +7,7 @@ class Request
         '/auth' => 'index/auth/auth',
         '/bioadminr' => 'index/admin/index',
         '/bioadminr/polls' => 'index/admin/polls',
+        '/bioadminr/polls/close' => 'index/admin/closePoll',
         '/bioadminr/polls/edit' => 'index/admin/editPoll',
         '/boost_game' => 'index/index/boostGame',
         '/login' => 'index/auth/index',
@@ -35,9 +36,20 @@ class Request
 
     private function checkPath($path)
     {
-        if (!array_key_exists($path, $this->routes)) exit('Wrong route');
+        $truePath = '';
+        if (array_key_exists($path, $this->routes)) {
+            $truePath = $path;
+        }
 
-        $pathParams = explode('/', $this->routes[$path]);
+        if (strlen($path) > 1) {
+            $path = preg_replace('/\/$/', '', $path);
+            if (array_key_exists($path, $this->routes)) {
+                $truePath = $path;
+            }
+        }
+        if ($truePath === '') exit('Wrong route');
+
+        $pathParams = explode('/', $this->routes[$truePath]);
         $this->bundle = $pathParams[0];
         $this->controller = $pathParams[1];
         $this->method = $pathParams[2];

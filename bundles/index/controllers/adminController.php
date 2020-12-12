@@ -103,7 +103,7 @@ class adminController extends baseController
                     <td>{$row['title']}</td>
                     <td>$formattedOpenDate</td>
                     <td>$formattedCloseDate</td>
-                    <td><a href='/bioadminr/polls/edit?id={$row['id']}'>Edit</a></td>
+                    <td><a href='/bioadminr/polls/edit?id={$row['id']}'>Edit</a> <a href='/bioadminr/polls/close?id={$row['id']}'>Close</a></td>
                 </tr>
                 ";
             }
@@ -148,5 +148,19 @@ class adminController extends baseController
 
         $this->request->setViewVariable('pollTitle', $poll['title']);
         $this->request->setViewVariable('tableRows', $tableRows);
+    }
+
+    public function closePoll()
+    {
+        $pollId = $this->request->get['id'];
+
+        $this->conf->devPrint('info', '/bundles/index/controllers/adminController->closePoll() here');
+
+        $poll = $this->dbConn->query("SELECT * FROM polls WHERE id = $pollId")->fetch_assoc();
+        if ($poll !== null) {
+            $this->dbConn->query("UPDATE polls SET close_date = NOW() WHERE id = $pollId");
+        }
+
+        header('Location: /bioadminr/polls');
     }
 }
