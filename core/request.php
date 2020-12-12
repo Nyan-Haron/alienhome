@@ -5,9 +5,15 @@ class Request
     private $routes = [
         '/' => 'index/index/index',
         '/auth' => 'index/auth/auth',
+        '/bioadminr' => 'index/admin/index',
+        '/bioadminr/polls' => 'index/admin/polls',
+        '/bioadminr/polls/edit' => 'index/admin/editPoll',
+        '/boost_game' => 'index/index/boostGame',
         '/login' => 'index/auth/index',
         '/logout' => 'index/auth/logout',
-        '/lk' => 'index/lk/index'
+        '/lk' => 'index/lk/index',
+        '/order_game' => 'index/index/orderGame',
+        '/poll' => 'index/polls/index'
     ];
 
     public $get = [];

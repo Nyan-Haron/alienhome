@@ -1,0 +1,24 @@
+<link rel="stylesheet" type="text/css" href="/bundles/index/styles/admin/style.css">
+<script src="/bundles/index/scripts/admin/index.js"></script>
+
+<a href="/bioadminr/polls">&lt; К списку голосований</a>
+<form action="" method="post">
+    <table>
+        <tr>
+            <td>Название</td>
+            <td><input type="text" name="pollTitle" value="{{pollTitle}}"></td>
+        </tr>
+        <tr id="pollOptionTemplate">
+            <td><input type="text" class="title"></td>
+            <td><input type="text" class="desc"></td>
+            <td><button type='button' class='removeOption'>-</button></td>
+        </tr>
+        {{tableRows}}
+        <tr id="lastRow">
+            <td><button type="button" id="addOption">+</button></td>
+        </tr>
+    </table>
+
+    <hr>
+    <button type="submit">Сохранить</button>
+</form>

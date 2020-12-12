@@ -1,0 +1,81 @@
+.theme-dark {
+    color: #c6c6c6;
+    background-color: #2f2f2f;
+}
+#pollOptionTemplate {
+    display: none;
+}
+.answer {
+    margin-bottom: 15px;
+}
+
+.input-group-addon {
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    color: #555555;
+    text-align: center;
+    background-color: #eeeeee;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+}
+.input-group-addon, .voteButton {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.input-group-addon, .input-group-btn, .input-group .form-control {
+    display: table-cell;
+}
+.theme-dark .input-group-addon {
+    background: #444;
+    color: #c6c6c6;
+    border-color: #111;
+    text-shadow: 0 1px 0 black;
+}
+.input-group :first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.input-group :last-child {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+.theme-dark .form-control {
+    color: white;
+    height: 34px;
+}
+
+.input-group .form-control {
+    width: 100%;
+    margin-bottom: 0;
+}
+.form-control {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.428571429;
+    color: #555555;
+    vertical-align: middle;
+    background-color: #ffffff;
+    background-image: none;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+.theme-dark .form-control {
+    -webkit-box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
+    -moz-box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
+    box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
+    background: #202020;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 0;
+}
+.theme-dark .voteButton {
+    background-color: #555555;
+    color: #cccccc;
+    border-color: #111111;
+}

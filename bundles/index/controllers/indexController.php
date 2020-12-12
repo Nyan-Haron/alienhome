@@ -7,8 +7,6 @@ class indexController extends baseController
         $maxBoost = 10;
         $htmlPath = '/public/bundles/index/views/index';
 
-        $this->checkSub();
-
         $this->conf->devPrint('info', '/bundles/index/controllers/indexController->index() here');
         $this->loadHeader();
         $this->request->setViewVariable('page', 'Home Page');
@@ -168,7 +166,7 @@ class indexController extends baseController
 
     }
 
-    public function boost_game() {
+    public function boostGame() {
         $this->conf->devPrint('info', '/bundles/index/controllers/indexController->boost_game() here');
         $this->request->setViewVariable('page', 'Home Page');
         $this->request->setViewVariable('userId', $this->authInfo['id']);
@@ -212,7 +210,7 @@ class indexController extends baseController
         header("Location: /");
     }
 
-    public function order_game() {
+    public function orderGame() {
         $this->conf->devPrint('info', '/bundles/index/controllers/indexController->order_game() here');
         $this->request->setViewVariable('page', 'Home Page');
         $this->request->setViewVariable('userId', $this->authInfo['id']);

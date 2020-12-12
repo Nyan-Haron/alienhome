@@ -19,7 +19,7 @@ class App
         $request = new Request($_SERVER['REQUEST_URI'], $conf->getPath('/bundles/'));
         $db = new Db($conf);
         $request->setLayout(file_get_contents($conf->getPath('/public/bundles/index/views/layout.html')));
-        $conf->devPrint('info', sprintf(
+        $conf->devPrint('htmlInfo', sprintf(
             'Calling /bundles/index/views/%s/%s.html',
             $request->controller,
             $request->method));
@@ -32,7 +32,7 @@ class App
             $request->setViewVariable('body', file_get_contents($layoutPath));
         }
 
-        $conf->devPrint('info', sprintf('Including /bundles/%s/controllers/%sController and calling %s() method' . "\n", $request->bundle, $request->controller, $request->method));
+        $conf->devPrint('methodInfo', sprintf('Including /bundles/%s/controllers/%sController and calling %s() method' . "\n", $request->bundle, $request->controller, $request->method));
         $this->includeOnce($conf->getPath(sprintf(
                 '/bundles/%s/controllers/%sController.php',
                 $request->bundle,

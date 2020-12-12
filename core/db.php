@@ -30,4 +30,9 @@ class Db
         $res = mysqli_query($this->conn, $q);
         return $res;
     }
+
+    public function escape($string)
+    {
+        return mysqli_real_escape_string($this->conn, $string);
+    }
 }
