@@ -24,10 +24,11 @@ class authController extends baseController
             $curl,
             CURLOPT_POSTFIELDS,
             sprintf(
-                "client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=http://new.alienhome.ru/auth",
+                "client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=%s",
                 $this->conf->getTwitchAppClientId(),
                 $this->conf->getTwitchAppSecret(),
-                $authToken
+                $authToken,
+                $this->conf->getAuthRedirectUri()
             )
         );
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
