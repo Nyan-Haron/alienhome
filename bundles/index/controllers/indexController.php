@@ -7,6 +7,8 @@ class indexController extends baseController
         $maxBoost = 10;
         $htmlPath = '/public/bundles/index/views/index';
 
+        $this->checkSub();
+
         $this->conf->devPrint('info', '/bundles/index/controllers/indexController->index() here');
         $this->loadHeader();
         $this->request->setViewVariable('page', 'Home Page');

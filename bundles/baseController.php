@@ -51,7 +51,7 @@ class baseController
             return true;
         }
 
-//        $this->conf->devPrint('session', $_SESSION);
+        $this->conf->devPrint('session', $_SESSION);
         if (!empty($_SESSION['auth'])) {
             $this->authInfo['auth'] = $_SESSION['auth'];
             $this->authInfo['authToken'] = $_SESSION['authToken'];

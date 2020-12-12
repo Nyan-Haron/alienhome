@@ -3,9 +3,8 @@
     <div id="authInfo">
         <span>You are logged in as <a href="/lk" id="auth_username" data-id="{{userId}}">{{userName}}</a></span>
         {{subCheck}}
-        <form id="logOut">
-            <input type="hidden" name="logout" value="logout" />
-            <input type="submit" value="logout" />
-        </form>
+        <a href="/logout">
+            <input type="button" value="logout" />
+        </a>
     </div>
 </div>
