@@ -120,11 +120,13 @@ class baseController
             return true;
         }
 
-        $str = "SELECT * FROM subscriptions WHERE user_twitch_id = {$this->authInfo['id']} AND check_date >= NOW() - INTERVAL 30 DAY ORDER BY check_date DESC LIMIT 1";
-        $this->conf->devPrint('str', $str);
-        $sub = $this->dbConn->query($str)->fetch_assoc();
+        $subChecker = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = 40955336")->fetch_assoc();
+        $user = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$_SESSION['id']}")->fetch_assoc();
 
-        if ($sub !== null) {
+        $this->conf->devPrint('subInfo', $subChecker['last_sub_date']);
+        $this->conf->devPrint('', $user['last_sub_date']);
+
+        if (strtotime($user['last_sub_date']) >= strtotime($subChecker['last_sub_date']) - 60*60) {
             $_SESSION['sub'] = $this->authInfo['sub'] = true;
             return true;
         }

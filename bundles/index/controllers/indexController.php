@@ -25,44 +25,13 @@ class indexController extends baseController
             $this->request->setViewVariable('subCheck', '<br/><span>You are subscribed to BioAlienR</span>');
         }
 
-        $pointsCount = 0;
+        $pointsInfo = helper::calculatePoints($this->authInfo['id'], $this->dbConn);
+        $pointsCount = (int) $pointsInfo['points'];
         if ($this->authInfo['sub']) {
-            $a = $this->dbConn->query("SELECT * FROM actions WHERE author_id = " . $this->authInfo['id'] . " ORDER BY date ASC");
-            $actions = [];
-            $usedPoints = 0;
-            $lastActionDate = date('Y-m-d H:i:s');
-            $nextPointDate = "";
-            while ($action = $a->fetch_assoc()) {
-                $actions[] = $action;
-                $usedPoints++;
-                if ($action['action_type'] == 'revive') {
-                    $usedPoints++;
-                }
-                if ($usedPoints == 3) {
-                    $lastActionDate = $action['date'];
-                }
-            }
+            $this->request->setViewVariable('pointsCount', $pointsInfo['points']);
+            $this->request->setViewVariable('nextPointText', $pointsInfo['nextPointDate'] ? ', следующее: ' . $pointsInfo['nextPointDate'] : '');
 
-            $secondsSinceLastAction = intval(date_format(date_create(), 'U')) - intval(date_format(date_create_from_format('Y-m-d H:i:s', $lastActionDate), 'U'));
-
-            if ($usedPoints < 3) {
-                $pointsCount = 3 - $usedPoints;
-            } else {
-                $pointsCount = floor($secondsSinceLastAction / 2592000) - $usedPoints + 3;
-                $nextPointDate = date("Y-m-d H:i:s",
-                    date_format(date_create(), 'U') - ($secondsSinceLastAction % 2592000) + 2592000);
-            }
-
-            if ($nextPointDate != "") {
-                $nextPointText = ", следующее: $nextPointDate";
-            } else {
-                $nextPointText = "";
-            }
-
-            $this->request->setViewVariable('pointsCount', $pointsCount);
-            $this->request->setViewVariable('nextPointText', $nextPointText);
-
-            if ($pointsCount > 0) {
+            if ($pointsInfo['points'] > 0) {
                 $this->request->setViewVariable('gameOrderForm', file_get_contents($this->conf->getPath("$htmlPath/gameOrderForm.html")));
             } else {
                 $this->request->setViewVariable('gameOrderForm', file_get_contents($this->conf->getPath("$htmlPath/gameOrderFormNoPoints.html")));

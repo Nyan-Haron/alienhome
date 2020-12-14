@@ -13,6 +13,7 @@ class App
         $conf = new Conf($mode);
 
         $this->includeOnce($conf->getPath('/bundles/baseController.php'));
+        $this->includeOnce($conf->getPath('/bundles/helper.php'));
         $this->includeOnce($conf->getPath('/db/baseEntity.php'));
         $this->includeOnce($conf->getPath('/db/baseRepository.php'));
 
