@@ -73,7 +73,6 @@ class baseController
     {
         $subChecker = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = 40955336")->fetch_assoc();
 
-        $this->request->setViewVariable('subList', '');
 //        if ($this->isAuth && $this->authInfo['id'] == '82304594') { // Харон
         if ($this->isAuth && $this->authInfo['id'] == '40955336') { // Илья
 
