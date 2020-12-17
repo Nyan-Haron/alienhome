@@ -71,6 +71,54 @@ class baseController
      */
     public function checkSub()
     {
+        $subChecker = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = 40955336")->fetch_assoc();
+
+        $this->request->setViewVariable('subList', '');
+//        if ($this->isAuth && $this->authInfo['id'] == '82304594') { // Харон
+        if ($this->isAuth && $this->authInfo['id'] == '40955336') { // Илья
+
+            if(strtotime($subChecker['last_sub_date']) + 60*60*12 < time()) {
+                $subList = '<p>Привет, Илья! Проверяю твоих сабов.</p>';
+                $token = $this->authInfo['authToken'];
+//                $this->conf->devPrint("authInfo", $this->authInfo);
+                $cursor = '';
+                $tries = 0;
+                $subList .= '<ul>';
+                do {
+//                    $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=82304594&after=$cursor");
+                    $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=40955336&after=$cursor");
+                    curl_setopt(
+                        $subCheck,
+                        CURLOPT_HTTPHEADER,
+                        ["Client-ID: {$this->conf->getTwitchAppClientId()}", "Authorization: Bearer {$token}"]
+                    );
+                    curl_setopt($subCheck, CURLOPT_RETURNTRANSFER, true);
+                    $subInfo = json_decode(curl_exec($subCheck), true);
+                    curl_close($subCheck);
+                    if ($subInfo === null) {
+                        header("Location: /auth/logout");
+                    }
+//                    $this->conf->devPrint('subInfo', $subInfo);
+                    foreach ($subInfo['data'] as $sub) {
+                        $user = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$sub['user_id']}")->fetch_assoc();
+                        if ($user !== null) {
+                            $this->dbConn->query("INSERT INTO subscriptions (user_twitch_id) VALUES ('{$user['twitch_id']}')");
+                            $this->dbConn->query("UPDATE users SET last_sub_date = NOW() WHERE twitch_id = {$user['twitch_id']}");
+                            $subList .= "<li>{$user['username']} ({$user['twitch_id']})</li>";
+                        }
+                    }
+                    $cursor = @$subInfo['pagination']['cursor'];
+                    $tries++;
+                } while (count($subInfo['data']) > 0 && $tries < 100);
+                $subList .= '</ul>';
+                $this->request->setViewVariable('subList', $subList);
+
+                $_SESSION['sub'] = $this->authInfo['sub'] = true;
+
+                return true;
+            }
+        }
+
         if (!$this->isAuth) {
             return false;
         }
@@ -83,48 +131,7 @@ class baseController
             return $_SESSION['sub'];
         }
 
-//        if ($this->isAuth && $this->authInfo['id'] == '82304594') { // Харон
-        if ($this->isAuth && $this->authInfo['id'] == '40955336') { // Илья
-            $token = $this->authInfo['authToken'];
-            $this->conf->devPrint("authInfo", $this->authInfo);
-            $cursor = '';
-            $tries = 0;
-            do {
-//                $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=82304594&after=$cursor");
-                $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=40955336&after=$cursor");
-                curl_setopt(
-                    $subCheck,
-                    CURLOPT_HTTPHEADER,
-                    ["Client-ID: {$this->conf->getTwitchAppClientId()}", "Authorization: Bearer {$token}"]
-                );
-                curl_setopt($subCheck, CURLOPT_RETURNTRANSFER, true);
-                $subInfo = json_decode(curl_exec($subCheck), true);
-                curl_close($subCheck);
-                if ($subInfo === null) {
-                    header("Location: /auth/logout");
-                }
-                $this->conf->devPrint('subInfo', $subInfo);
-                foreach ($subInfo['data'] as $sub) {
-                    $user = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$sub['user_id']}")->fetch_assoc();
-                    if ($user !== null) {
-                        $this->dbConn->query("INSERT INTO subscriptions (user_twitch_id) VALUES ('{$user['twitch_id']}')");
-                        $this->dbConn->query("UPDATE users SET last_sub_date = NOW() WHERE twitch_id = {$user['twitch_id']}");
-                    }
-                }
-                $cursor = $subInfo['pagination']['cursor'];
-                $tries++;
-            } while (count($subInfo['data']) > 0 && $tries < 100);
-
-            $_SESSION['sub'] = $this->authInfo['sub'] = true;
-
-            return true;
-        }
-
-        $subChecker = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = 40955336")->fetch_assoc();
         $user = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$_SESSION['id']}")->fetch_assoc();
-
-        $this->conf->devPrint('subInfo', $subChecker['last_sub_date']);
-        $this->conf->devPrint('', $user['last_sub_date']);
 
         if (strtotime($user['last_sub_date']) >= strtotime($subChecker['last_sub_date']) - 60*60) {
             $_SESSION['sub'] = $this->authInfo['sub'] = true;
