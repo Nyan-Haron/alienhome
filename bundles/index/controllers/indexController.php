@@ -169,9 +169,9 @@ class indexController extends baseController
         }
 
         if ($this->authInfo['sub'] && $pointsCount >= 1) {
-            $game = $this->dbConn->query('SELECT games.id, statuses.code FROM games JOIN statuses ON (statuses.id = games.status_id) WHERE games.id = ' . mysqli_escape_string($this->dbConn, $this->request->get['game']))->fetch_assoc();
+            $game = $this->dbConn->query('SELECT games.id, statuses.code FROM games JOIN statuses ON (statuses.id = games.status_id) WHERE games.id = ' . $this->dbConn->escape($this->request->get['game']))->fetch_assoc();
             if ($game['code'] == 'agree') {
-                $this->dbConn->query("INSERT INTO actions (game, action_type, author_id) VALUES (" . mysqli_escape_string($this->dbConn, $this->request->get['game']) . ", 'boost', " . $this->authInfo['id'] . ")");
+                $this->dbConn->query("INSERT INTO actions (game, action_type, author_id) VALUES (" . $this->dbConn->escape($this->request->get['game']) . ", 'boost', " . $this->authInfo['id'] . ")");
                 $boostStatus = $this->dbConn->query("SELECT * FROM statuses WHERE code = 'boost'")->fetch_assoc();
                 $this->dbConn->query("UPDATE games SET status_id = " . $boostStatus['id'] . ", status_change_date = NOW() WHERE id = " . $game['id']);
                 $this->dbConn->query('INSERT INTO game_statuses_log (game, status_id, change_date) VALUES (' . $game['id'] . ', ' . $boostStatus['id'] . ', NOW());');
@@ -212,7 +212,7 @@ class indexController extends baseController
             $pointsCount = round($secondsSinceLastAction / 2592000) - $usedPoints+3;
         }
 
-        $gameTitle = mysqli_escape_string($this->dbConn, $this->request->get['newGameTitle']);
+        $gameTitle = $this->dbConn->escape($this->request->get['newGameTitle']);
         if ($this->authInfo['sub'] && $pointsCount >= 1 && $gameTitle != '') {
             $authorId = $this->authInfo['id'];
             $this->dbConn->query("INSERT INTO games (title, author_id) VALUES ('{$gameTitle}', {$authorId})");
