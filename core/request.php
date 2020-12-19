@@ -14,7 +14,8 @@ class Request
         '/logout' => 'index/auth/logout',
         '/lk' => 'index/lk/index',
         '/order_game' => 'index/index/orderGame',
-        '/poll' => 'index/polls/index'
+        '/poll' => 'index/polls/index',
+        '/revive_game' => 'index/index/reviveGame'
     ];
 
     public $get = [];

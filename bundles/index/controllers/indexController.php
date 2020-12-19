@@ -145,36 +145,18 @@ class indexController extends baseController
         $this->request->setViewVariable('subCheck', '');
         $this->request->setViewVariable('body', 'Game has been boosted!');
 
-        $a = $this->dbConn->query("SELECT * FROM actions WHERE author_id = ".$this->authInfo['id']." ORDER BY date ASC");
-        $actions = [];
-        $usedPoints = 0;
-        $lastActionDate = date('Y-m-d H:i:s');
-        while ($action = $a->fetch_assoc()) {
-            $actions[] = $action;
-            $usedPoints++;
-            if ($action['action_type'] == 'revive') {
-                $usedPoints++;
-            }
-            if ($usedPoints == 3) {
-                $lastActionDate = $action['date'];
-            }
-        }
+        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}");
 
-        $secondsSinceLastAction = intval(date_format(date_create(), 'U')) - intval(date_format(date_create_from_format('Y-m-d H:i:s', $lastActionDate), 'U'));
+        if ($this->authInfo['sub']  && $user['sub_points'] >= 1) {
+            $game = $this->dbConn
+                ->query('SELECT games.id, statuses.code FROM games JOIN statuses ON (statuses.id = games.status_id) WHERE games.id = ' . $this->dbConn->escape($this->request->get['game']))->fetch_assoc();
 
-        if ($usedPoints < 3) {
-            $pointsCount = 3 - $usedPoints;
-        } else {
-            $pointsCount = round($secondsSinceLastAction / 2592000) - $usedPoints+3;
-        }
-
-        if ($this->authInfo['sub'] && $pointsCount >= 1) {
-            $game = $this->dbConn->query('SELECT games.id, statuses.code FROM games JOIN statuses ON (statuses.id = games.status_id) WHERE games.id = ' . $this->dbConn->escape($this->request->get['game']))->fetch_assoc();
             if ($game['code'] == 'agree') {
-                $this->dbConn->query("INSERT INTO actions (game, action_type, author_id) VALUES (" . $this->dbConn->escape($this->request->get['game']) . ", 'boost', " . $this->authInfo['id'] . ")");
+                $this->dbConn->query("INSERT INTO actions (game, action_type, author_id) VALUES ({$this->dbConn->escape($this->request->get['game'])}, 'boost', {$this->authInfo['id']})");
                 $boostStatus = $this->dbConn->query("SELECT * FROM statuses WHERE code = 'boost'")->fetch_assoc();
-                $this->dbConn->query("UPDATE games SET status_id = " . $boostStatus['id'] . ", status_change_date = NOW() WHERE id = " . $game['id']);
-                $this->dbConn->query('INSERT INTO game_statuses_log (game, status_id, change_date) VALUES (' . $game['id'] . ', ' . $boostStatus['id'] . ', NOW());');
+                $this->dbConn->query("UPDATE games SET status_id = {$boostStatus['id']}, status_change_date = NOW() WHERE id = " . $game['id']);
+                $this->dbConn->query("INSERT INTO game_statuses_log (game, status_id, change_date) VALUES ({$game['id']}, {$boostStatus['id']}, NOW());");
+                $this->dbConn->query("UPDATE users SET sub_points = sub_points - 1  WHERE twitch_id = {$this->authInfo['id']}");
             }
         }
 
@@ -189,35 +171,38 @@ class indexController extends baseController
         $this->request->setViewVariable('subCheck', '');
         $this->request->setViewVariable('body', 'Game has been ordered!');
 
-        $a = $this->dbConn->query("SELECT * FROM actions WHERE author_id = ".$this->authInfo['id']." ORDER BY date ASC");
-        $actions = [];
-        $usedPoints = 0;
-        $lastActionDate = date('Y-m-d H:i:s');
-        while ($action = $a->fetch_assoc()) {
-            $actions[] = $action;
-            $usedPoints++;
-            if ($action['action_type'] == 'revive') {
-                $usedPoints++;
-            }
-            if ($usedPoints == 3) {
-                $lastActionDate = $action['date'];
-            }
-        }
-
-        $secondsSinceLastAction = intval(date_format(date_create(), 'U')) - intval(date_format(date_create_from_format('Y-m-d H:i:s', $lastActionDate), 'U'));
-
-        if ($usedPoints < 3) {
-            $pointsCount = 3 - $usedPoints;
-        } else {
-            $pointsCount = round($secondsSinceLastAction / 2592000) - $usedPoints+3;
-        }
-
+        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}");
         $gameTitle = $this->dbConn->escape($this->request->get['newGameTitle']);
-        if ($this->authInfo['sub'] && $pointsCount >= 1 && $gameTitle != '') {
+        if ($this->authInfo['sub'] && $user['sub_points'] >= 1 && $gameTitle != '') {
             $authorId = $this->authInfo['id'];
-            $this->dbConn->query("INSERT INTO games (title, author_id) VALUES ('{$gameTitle}', {$authorId})");
-            $lastGameId = $this->dbConn->query("SELECT id FROM games WHERE title = '{$gameTitle}' AND author_id = {$authorId} ORDER BY id DESC LIMIT 1;")->fetch_array()[0];
-            $this->dbConn->query("INSERT INTO actions (game, action_type, author_id) VALUES ('{$lastGameId}', 'order', {$authorId})");
+            $this->dbConn->query("INSERT INTO games (title, author_id) VALUES ('$gameTitle', $authorId)");
+            $lastGameId = $this->dbConn->query("SELECT id FROM games WHERE title = '$gameTitle' AND author_id = $authorId ORDER BY id DESC LIMIT 1;")->fetch_array()[0];
+            $this->dbConn->query("INSERT INTO actions (game, action_type, author_id) VALUES ('$lastGameId', 'order', $authorId)");
+            $this->dbConn->query("UPDATE users SET sub_points = sub_points - 1  WHERE twitch_id = $authorId");
+        }
+
+        header("Location: /");
+    }
+
+    public function reviveGame() {
+        $this->conf->devPrint('info', '/bundles/index/controllers/indexController->revive_game() here');
+        $this->request->setViewVariable('page', 'Home Page');
+        $this->request->setViewVariable('userId', $this->authInfo['id']);
+        $this->request->setViewVariable('userName', $this->authInfo['name']);
+        $this->request->setViewVariable('subCheck', '');
+        $this->request->setViewVariable('body', 'Game has been ordered!');
+
+        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}");
+        $game = $this->dbConn->query('SELECT games.id, statuses.code, games.is_revived FROM games JOIN statuses ON (statuses.id = games.status_id) WHERE games.id = ' . $this->dbConn->escape($this->request->get['game']))->fetch_assoc();
+        if ($this->authInfo['sub'] && $user['sub_points'] >= 3 && $game['is_revived'] == 0) {
+            if ($game['code'] == 'disagree') {
+                $this->dbConn->query("INSERT INTO actions (game, action_type, author_id) VALUES (" . $this->dbConn->escape($this->request->get['game']) . ", 'revive', {$this->authInfo['id']})");
+                $agreeStatus = $this->dbConn->query("SELECT * FROM statuses WHERE code = 'agree'")->fetch_assoc();
+                $this->dbConn->query("UPDATE games SET status_id = {$agreeStatus['id']}, status_change_date = NOW(), is_revived = 1 WHERE id = {$game['id']}");
+                $revivedStatus = $this->dbConn->query("SELECT * FROM statuses WHERE code = 'revived'")->fetch_assoc();
+                $this->dbConn->query("INSERT INTO game_statuses_log (game, status_id, change_date) VALUES ({$game['id']}, {$revivedStatus['id']}, NOW());");
+                $this->dbConn->query("UPDATE users SET sub_points = sub_points - 3  WHERE twitch_id = {$this->authInfo['id']}");
+            }
         }
 
         header("Location: /");
