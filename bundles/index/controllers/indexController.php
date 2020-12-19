@@ -145,7 +145,7 @@ class indexController extends baseController
         $this->request->setViewVariable('subCheck', '');
         $this->request->setViewVariable('body', 'Game has been boosted!');
 
-        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}");
+        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}")->fetch_assoc();
 
         if ($this->authInfo['sub']  && $user['sub_points'] >= 1) {
             $game = $this->dbConn
@@ -171,7 +171,7 @@ class indexController extends baseController
         $this->request->setViewVariable('subCheck', '');
         $this->request->setViewVariable('body', 'Game has been ordered!');
 
-        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}");
+        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}")->fetch_assoc();
         $gameTitle = $this->dbConn->escape($this->request->get['newGameTitle']);
         if ($this->authInfo['sub'] && $user['sub_points'] >= 1 && $gameTitle != '') {
             $authorId = $this->authInfo['id'];
@@ -192,7 +192,7 @@ class indexController extends baseController
         $this->request->setViewVariable('subCheck', '');
         $this->request->setViewVariable('body', 'Game has been ordered!');
 
-        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}");
+        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}")->fetch_assoc();
         $game = $this->dbConn->query('SELECT games.id, statuses.code, games.is_revived FROM games JOIN statuses ON (statuses.id = games.status_id) WHERE games.id = ' . $this->dbConn->escape($this->request->get['game']))->fetch_assoc();
         if ($this->authInfo['sub'] && $user['sub_points'] >= 3 && $game['is_revived'] == 0) {
             if ($game['code'] == 'disagree') {
