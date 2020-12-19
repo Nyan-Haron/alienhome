@@ -140,12 +140,10 @@ class indexController extends baseController
     public function boostGame() {
         $this->conf->devPrint('info', '/bundles/index/controllers/indexController->boost_game() here');
         $this->request->setViewVariable('page', 'Home Page');
-        $this->request->setViewVariable('userId', $this->authInfo['id']);
-        $this->request->setViewVariable('userName', $this->authInfo['name']);
-        $this->request->setViewVariable('subCheck', '');
+        $this->request->setViewVariable('header', '');
         $this->request->setViewVariable('body', 'Game has been boosted!');
 
-        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}")->fetch_assoc();
+        $user = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$this->authInfo['id']}")->fetch_assoc();
 
         if ($this->authInfo['sub']  && $user['sub_points'] >= 1) {
             $game = $this->dbConn
@@ -166,12 +164,10 @@ class indexController extends baseController
     public function orderGame() {
         $this->conf->devPrint('info', '/bundles/index/controllers/indexController->order_game() here');
         $this->request->setViewVariable('page', 'Home Page');
-        $this->request->setViewVariable('userId', $this->authInfo['id']);
-        $this->request->setViewVariable('userName', $this->authInfo['name']);
-        $this->request->setViewVariable('subCheck', '');
+        $this->request->setViewVariable('header', '');
         $this->request->setViewVariable('body', 'Game has been ordered!');
 
-        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}")->fetch_assoc();
+        $user = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$this->authInfo['id']}")->fetch_assoc();
         $gameTitle = $this->dbConn->escape($this->request->get['newGameTitle']);
         if ($this->authInfo['sub'] && $user['sub_points'] >= 1 && $gameTitle != '') {
             $authorId = $this->authInfo['id'];
@@ -187,12 +183,10 @@ class indexController extends baseController
     public function reviveGame() {
         $this->conf->devPrint('info', '/bundles/index/controllers/indexController->revive_game() here');
         $this->request->setViewVariable('page', 'Home Page');
-        $this->request->setViewVariable('userId', $this->authInfo['id']);
-        $this->request->setViewVariable('userName', $this->authInfo['name']);
-        $this->request->setViewVariable('subCheck', '');
-        $this->request->setViewVariable('body', 'Game has been ordered!');
+        $this->request->setViewVariable('header', '');
+        $this->request->setViewVariable('body', 'Game has been revived!');
 
-        $user = $this->dbConn->query("SELECT * FROM users WHERE id = {$this->authInfo['id']}")->fetch_assoc();
+        $user = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$this->authInfo['id']}")->fetch_assoc();
         $game = $this->dbConn->query('SELECT games.id, statuses.code, games.is_revived FROM games JOIN statuses ON (statuses.id = games.status_id) WHERE games.id = ' . $this->dbConn->escape($this->request->get['game']))->fetch_assoc();
         if ($this->authInfo['sub'] && $user['sub_points'] >= 3 && $game['is_revived'] == 0) {
             if ($game['code'] == 'disagree') {
