@@ -20,10 +20,10 @@ class pollsController extends baseController
         $optionTile = file_get_contents($this->conf->getPath("$htmlPath/optionTile.html"));
 
         if (!isset($this->request->get['poll_id'])) {
-            $poll = $this->dbConn->query('SELECT *, IF(close_date IS NULL, 0, 1) AS closed FROM polls ORDER BY open_date DESC')->fetch_assoc();
+            $poll = $this->dbConn->query('SELECT id FROM polls ORDER BY open_date DESC')->fetch_assoc();
             header('Location: /poll?' . http_build_query(['poll_id' => $poll['id']]));
         } else {
-            $poll = $this->dbConn->query('SELECT *, IF(close_date IS NULL, 0, 1) AS closed FROM polls WHERE id = ' . ((int) $this->request->get['poll_id']))->fetch_assoc();
+            $poll = $this->dbConn->query('SELECT *, close_date IS NULL AS closed FROM polls WHERE id = ' . ((int) $this->request->get['poll_id']))->fetch_assoc();
         }
 
         if ($poll === null) {
