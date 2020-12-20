@@ -202,4 +202,21 @@ class indexController extends baseController
         header("Location: /");
     }
 
+    public function getTwitchGames()
+    {
+        $this->request->setLayout('');
+        $token = $this->authInfo['authToken'];
+        $query = $this->request->get['query'];
+
+        $gameCheck = curl_init("https://api.twitch.tv/helix/search/categories?query=$query");
+        curl_setopt(
+            $gameCheck,
+            CURLOPT_HTTPHEADER,
+            ["Client-ID: {$this->conf->getTwitchAppClientId()}", "Authorization: Bearer {$token}"]
+        );
+        curl_setopt($gameCheck, CURLOPT_RETURNTRANSFER, true);
+        $gameInfo = json_decode(curl_exec($gameCheck), true);
+        curl_close($gameCheck);
+        echo json_encode($gameInfo);
+    }
 }

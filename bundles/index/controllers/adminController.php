@@ -103,7 +103,10 @@ class adminController extends baseController
                     <td>{$row['title']}</td>
                     <td>$formattedOpenDate</td>
                     <td>$formattedCloseDate</td>
-                    <td><a href='/bioadminr/polls/edit?id={$row['id']}'>Edit</a> <a href='/bioadminr/polls/close?id={$row['id']}'>Close</a></td>
+                    <td>
+                        <a href='/bioadminr/polls/edit?id={$row['id']}'>Edit</a>
+                        <a href='/bioadminr/polls/close?id={$row['id']}'>Close</a>
+                    </td>
                 </tr>
                 ";
             }
@@ -133,15 +136,24 @@ class adminController extends baseController
         $this->request->setViewVariable('header', '');
 
         $poll = $this->dbConn->query("SELECT * FROM polls WHERE id = $pollId")->fetch_assoc();
+        $sumVoteCount = (int) $this->dbConn->query("SELECT COUNT(*) FROM poll_votes WHERE poll_id = $pollId")->fetch_row()[0];
 
         $tableRows = '';
-        $r = $this->dbConn->query("SELECT * FROM poll_options WHERE poll_id = $pollId");
+        $r = $this->dbConn->query("SELECT po.*, COUNT(pv.user_twitch_id) AS voteCount FROM poll_options AS po
+              LEFT JOIN poll_votes AS pv ON pv.poll_option_id = po.id
+            WHERE po.poll_id = $pollId
+            GROUP BY po.id");
         while ($pollOption = $r->fetch_assoc()) {
+            $votePercent = ($pollOption['voteCount']) ? round($sumVoteCount / $pollOption['voteCount'] * 100, 2) : 0;
             $tableRows .= "
             <tr>
-                <td><input type='text' name='optionTitles[]' value='{$pollOption['title']}'></td>
-                <td><input type='text' name='optionDescs[]' value='{$pollOption['description']}'></td>
+                <td>
+                    <input type='text' name='optionTitles[]' value='{$pollOption['title']}'>
+                    <div class='gameList'></div>
+                </td>
+                <td><input type='text' name='optionDescs[]' value='{$pollOption['description']}' style='width: 100%'></td>
                 <td><button type='button' class='removeOption'>-</button></td>
+                <td>Голосов: {$pollOption['voteCount']} ($votePercent%)</td>
             </tr>
             ";
         }
@@ -162,5 +174,12 @@ class adminController extends baseController
         }
 
         header('Location: /bioadminr/polls');
+    }
+
+    public function createPoll()
+    {
+        $this->dbConn->query('INSERT INTO polls (title) VALUES ("Новое голосование")');
+        $id = $this->dbConn->query('SELECT LAST_INSERT_ID() AS id')->fetch_assoc()['id'];
+        header("Location: /bioadminr/polls/edit?id=$id");
     }
 }

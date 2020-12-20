@@ -8,7 +8,9 @@ class Request
         '/bioadminr' => 'index/admin/index',
         '/bioadminr/polls' => 'index/admin/polls',
         '/bioadminr/polls/close' => 'index/admin/closePoll',
+        '/bioadminr/polls/create' => 'index/admin/createPoll',
         '/bioadminr/polls/edit' => 'index/admin/editPoll',
+        '/get_twitch_games' => 'index/index/getTwitchGames',
         '/boost_game' => 'index/index/boostGame',
         '/login' => 'index/auth/index',
         '/logout' => 'index/auth/logout',
@@ -75,10 +77,12 @@ class Request
 
         $neededVariables = [];
         preg_match('/\{\{(\w+)\}\}/', $layout, $neededVariables);
-        $variableDifference = array_diff([$neededVariables[1]], array_keys($viewVariables));
+        if (!empty($neededVariables)) {
+            $variableDifference = array_diff([$neededVariables[1]], array_keys($viewVariables));
 
-        if (!empty($variableDifference)) {
-            return 'ERROR! Не получится отрендерить шаблон: не хватает переменных: ' . json_encode($variableDifference);
+            if (!empty($variableDifference)) {
+                return 'ERROR! Не получится отрендерить шаблон: не хватает переменных: ' . json_encode($variableDifference);
+            }
         }
 
         foreach ($viewVariables as $k => $v) {

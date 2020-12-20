@@ -32,7 +32,7 @@ class pollsController extends baseController
 
         $currentVote = $this->dbConn->query("SELECT * FROM poll_votes WHERE poll_id = {$poll['id']} AND user_twitch_id = {$this->authInfo['id']}")->fetch_assoc();
 
-        if (!empty($this->request->post['vote']) && $currentVote === null) {
+        if (!empty($this->request->post['vote']) && $currentVote === null && !$poll['closed'] && $this->authInfo['sub']) {
             $vote = $this->request->post['vote'];
             $option = $this->dbConn->query("SELECT * FROM poll_options WHERE poll_id = {$poll['id']} AND id = $vote")->fetch_assoc();
             if ($option !== null) {
@@ -49,7 +49,7 @@ class pollsController extends baseController
             GROUP BY po.id ORDER BY voteCount DESC");
         while($option = $r->fetch_assoc()) {
             $votePercent = ($option['voteCount']) ? round($sumVoteCount / $option['voteCount'] * 100, 2) : 0;
-            if ($poll['closed'] || $currentVote !== null) {
+            if ($poll['closed'] || $currentVote !== null || !$this->authInfo['sub']) {
                 $voteInfo = "Голосов: {$option['voteCount']} ($votePercent%)";
             } else {
                 $voteInfo = '<button class="voteButton" type="submit" name="vote" value="{{optionId}}">Проголосовать</button>';

@@ -3,14 +3,17 @@
 
 <a href="/bioadminr/polls">&lt; К списку голосований</a>
 <form action="" method="post">
-    <table>
+    <table style="width: 100%" id="editPollTable">
         <tr>
             <td>Название</td>
-            <td><input type="text" name="pollTitle" value="{{pollTitle}}"></td>
+            <td><input type="text" name="pollTitle" value="{{pollTitle}}" style="width: 100%"></td>
         </tr>
         <tr id="pollOptionTemplate">
-            <td><input type="text" class="title"></td>
-            <td><input type="text" class="desc"></td>
+            <td width="300px">
+                <input type="text" class="title">
+                <div class="gameList"></div>
+            </td>
+            <td><input type="text" class="desc" style="width: 100%"></td>
             <td><button type='button' class='removeOption'>-</button></td>
         </tr>
         {{tableRows}}

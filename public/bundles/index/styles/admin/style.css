@@ -79,3 +79,8 @@
     color: #cccccc;
     border-color: #111111;
 }
+
+.twitchGame {
+    padding: 3px;
+    margin: 2px;
+}
