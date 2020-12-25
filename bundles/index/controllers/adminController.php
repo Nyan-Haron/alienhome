@@ -6,7 +6,7 @@ class adminController extends baseController
     {
         $htmlPath = '/public/bundles/index/views/admin';
 
-        $this->checkSub();
+        $this->checkSub(!empty($this->request->get['mode']) && $this->request->get['mode'] === 'subcheck');
 
         $this->conf->devPrint('info', '/bundles/index/controllers/adminController->index() here');
         $this->request->setViewVariable('page', 'Admin Page');

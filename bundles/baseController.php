@@ -67,22 +67,25 @@ class baseController
     }
 
     /**
+     * @param bool $forced
      * @return bool
      */
-    public function checkSub()
+    public function checkSub($forced = false)
     {
         $subChecker = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = 40955336")->fetch_assoc();
 
 //        if ($this->isAuth && $this->authInfo['id'] == '82304594') { // Харон
         if ($this->isAuth && $this->authInfo['id'] == '40955336') { // Илья
 
-            if(strtotime($subChecker['last_sub_date']) + 60*60*12 < time()) {
-                $subList = '<p>Привет, Илья! Проверяю твоих сабов.</p>';
+            if(strtotime($subChecker['last_sub_date']) + 60*60*12 < time() || $forced) {
+                $subList = '<p>Привет, Илья! Проверяю твоих сабов.</p><ul>';
                 $token = $this->authInfo['authToken'];
 //                $this->conf->devPrint("authInfo", $this->authInfo);
                 $cursor = '';
                 $tries = 0;
-                $subList .= '<ul>';
+                $extraTries = 0;
+                $subCount = 0;
+                $pageVolume = 0;
                 do {
 //                    $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=82304594&after=$cursor");
                     $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=40955336&after=$cursor");
@@ -94,22 +97,45 @@ class baseController
                     curl_setopt($subCheck, CURLOPT_RETURNTRANSFER, true);
                     $subInfo = json_decode(curl_exec($subCheck), true);
                     curl_close($subCheck);
+//                    $this->conf->devPrint('subInfo', $subInfo);
+
                     if ($subInfo === null) {
                         header("Location: /auth/logout");
                     }
-//                    $this->conf->devPrint('subInfo', $subInfo);
-                    foreach ($subInfo['data'] as $sub) {
-                        $user = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$sub['user_id']}")->fetch_assoc();
-                        if ($user !== null) {
-                            $this->dbConn->query("INSERT INTO subscriptions (user_twitch_id) VALUES ('{$user['twitch_id']}')");
-                            $this->dbConn->query("UPDATE users SET last_sub_date = NOW() WHERE twitch_id = {$user['twitch_id']}");
-                            $subList .= "<li>{$user['username']} ({$user['twitch_id']})</li>";
+
+                    if (isset($subInfo['data'])) {
+                        $pageVolume = count($subInfo['data']);
+
+                        foreach ($subInfo['data'] as $sub) {
+                            $subCheckUser = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$sub['user_id']}")->fetch_assoc();
+                            $q = $this->dbConn->query("SELECT * FROM subscriptions WHERE user_twitch_id = {$subCheckUser['twitch_id']} ORDER BY check_date DESC");
+                            if ($subCheckUser !== null) {
+                                $subCount++;
+                                if ($q) {
+                                    $prevSub = $q->fetch_assoc();
+//                                    $gap = floor((time() - strtotime($prevSub['check_date'])) / 86400);
+                                    $cumulativeSubDays = $prevSub['overall_sub_days'] + 1;
+                                } else {
+                                    $cumulativeSubDays = 1;
+                                }
+                                $this->dbConn->query("INSERT INTO subscriptions (user_twitch_id, overall_sub_days) VALUES ('{$subCheckUser['twitch_id']}', {$cumulativeSubDays})");
+                                $this->dbConn->query("UPDATE users SET last_sub_date = NOW() WHERE twitch_id = {$subCheckUser['twitch_id']}");
+                                $subList .= "<li>{$subCheckUser['username']} ({$subCheckUser['twitch_id']}) &mdash; $cumulativeSubDays дней</li>";
+                            }
                         }
+
+                        if (!isset($subInfo['pagination']['cursor'])) break;
+                        $cursor = $subInfo['pagination']['cursor'];
+                    } else {
+                        echo 'При проверке сабов что-то пошло не так и твитч ответил вот что: ';
+                        var_dump($subInfo);
+                        $tries++;
                     }
-                    $cursor = @$subInfo['pagination']['cursor'];
-                    $tries++;
-                } while (count($subInfo['data']) > 0 && $tries < 100);
-                $subList .= '</ul>';
+
+                    $extraTries++;
+                } while ($pageVolume > 0 && $tries < 10 && $extraTries < 100);
+
+                $subList .= '</ul><p>Найдено сабов: ' . $subCount . '</p>';
                 $this->request->setViewVariable('subList', $subList);
 
                 $_SESSION['sub'] = $this->authInfo['sub'] = true;
