@@ -4,7 +4,7 @@
     <h2>{{title}}</h2>
     <form action="" method="post">
         {{options}}
-        <button type="submit">Подтвердить голос</button>
+        {{submitButton}}
     </form>
 </div>
 
@@ -34,8 +34,10 @@
         }, 5000);
 
         $('.pollOption').click(function () {
-            $('.pollOption').removeClass('chosen');
-            $(this).addClass('chosen');
+            if ($('#pollSubmit').length) {
+                $('.pollOption').removeClass('chosen');
+                $(this).addClass('chosen');
+            }
         });
     });
 </script>

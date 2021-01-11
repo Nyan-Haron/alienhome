@@ -47,6 +47,7 @@ class pollsController extends baseController
 
         $sumVoteCount = (int) $this->dbConn->query("SELECT COUNT(*) FROM poll_votes WHERE poll_id = {$poll['id']}")->fetch_row()[0];
 
+        $submitButton = '';
         $options = '';
         $r = $this->dbConn->query("SELECT po.*, COUNT(pv.user_twitch_id) AS voteCount FROM poll_options AS po
               LEFT JOIN poll_votes AS pv ON pv.poll_option_id = po.id
@@ -60,6 +61,7 @@ class pollsController extends baseController
                     (<span class='votesPercent_{$option['id']}'>$votePercent</span>%)";
             } else {
                 $voteInfo = '<input type="radio" class="voteRadio" name="vote" value="{{optionId}}">';
+                $submitButton = '<button type="submit" id="pollSubmit">Подтвердить голос</button>';
             }
 
             $options .= $this->request->renderLayout($optionTile, [
@@ -74,6 +76,7 @@ class pollsController extends baseController
         $this->request->setViewVariable('title', $poll['title']);
         $this->request->setViewVariable('options', $options);
         $this->request->setViewVariable('pollId', $poll['id']);
+        $this->request->setViewVariable('submitButton', $submitButton);
     }
 
     public function loadPollJson()
