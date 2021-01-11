@@ -188,6 +188,7 @@ class adminController extends baseController
         $this->request->setViewVariable('page', 'Admin Page');
         $this->request->setViewVariable('header', '');
         $this->request->setViewVariable('subList', '');
+        $this->request->setViewVariable('body', '');
 
         $checkDays = [];
         $d = $this->dbConn->query("SELECT DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day FROM subscriptions WHERE user_twitch_id = 40955336 AND granted_point = FALSE ORDER BY check_date ASC");
