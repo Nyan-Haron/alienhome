@@ -77,7 +77,7 @@ class baseController
 //        if ($this->isAuth && $this->authInfo['id'] == '82304594') { // Харон
         if ($this->isAuth && $this->authInfo['id'] == '40955336') { // Илья
 
-            if(strtotime($subChecker['last_sub_date']) + 60*60*12 < time() || $forced) {
+            if(strtotime($subChecker['last_sub_date']) + 60*60*12 < time() || ($forced && strtotime($subChecker['last_sub_date']) + 60*10 < time())) {
                 $subList = '<p>Привет, Илья! Проверяю твоих сабов.</p><ul>';
                 $token = $this->authInfo['authToken'];
 //                $this->conf->devPrint("authInfo", $this->authInfo);
@@ -113,8 +113,8 @@ class baseController
                                 $subCount++;
                                 if ($q) {
                                     $prevSub = $q->fetch_assoc();
-//                                    $gap = floor((time() - strtotime($prevSub['check_date'])) / 86400);
-                                    $cumulativeSubDays = $prevSub['overall_sub_days'] + 1;
+                                    $gap = floor(time() / 86400) - floor(strtotime($prevSub['check_date']) / 86400);
+                                    $cumulativeSubDays = $prevSub['overall_sub_days'] + $gap;
                                 } else {
                                     $cumulativeSubDays = 1;
                                 }
@@ -166,6 +166,70 @@ class baseController
         $_SESSION['sub'] = $this->authInfo['sub'] = false;
 
         return false;
+    }
+
+    protected function fixOverallSubDays() {
+
+//        $r = $this->dbConn->query('SELECT * FROM users WHERE twitch_id != ""');
+//        while ($user = $r->fetch_assoc()) {
+//            $nextSub = $this->dbConn
+//                ->query("SELECT * FROM subscriptions WHERE user_twitch_id = {$user['twitch_id']} AND overall_sub_days = 0 ORDER BY check_date ASC")
+//                ->fetch_assoc();
+//
+//            if ($nextSub !== null) {
+//                $this->dbConn->query("UPDATE subscriptions SET overall_sub_days = 1 WHERE id = {$nextSub['id']}");
+//                var_dump("Set overall_sub_days to 1 for {$nextSub['id']}");
+//            }
+//        }
+
+        $r = $this->dbConn->query('SELECT * FROM subscriptions WHERE user_twitch_id = 40955336 ORDER BY check_date ASC');
+        $subChecks = [];
+        while ($check = $r->fetch_assoc()) {
+            $subChecks[] = new DateTime($check['check_date']);
+        }
+
+        $r = $this->dbConn->query('SELECT * FROM users WHERE twitch_id != ""');
+        while ($user = $r->fetch_assoc()) {
+            $this->conf->devPrint('User', $user['username']);
+            $prevSub = $this->dbConn
+                ->query("SELECT * FROM subscriptions WHERE user_twitch_id = {$user['twitch_id']} AND overall_sub_days != 0 ORDER BY check_date DESC")
+                ->fetch_assoc();
+            $nextSub = $this->dbConn
+                ->query("SELECT * FROM subscriptions WHERE user_twitch_id = {$user['twitch_id']} AND overall_sub_days = 0 ORDER BY check_date ASC")
+                ->fetch_assoc();
+            if ($prevSub !== null) {
+                $prevCheck = new DateTime($prevSub['check_date']);
+                $streak = false;
+                foreach ($subChecks as $subCheck) {
+//                    $this->conf->devPrint('check', $subCheck->format('Y-m-d H:i:s'));
+                    if ($subCheck->getTimestamp() - $prevCheck->getTimestamp() > -60) {
+                        if (abs($prevCheck->getTimestamp() - $subCheck->getTimestamp()) < 60) {
+                            var_dump("Found previous sub check: {$prevCheck->format('Y-m-d H:i:s')}");
+                            $streak = true;
+                        } elseif (abs((new DateTime($nextSub['check_date']))->getTimestamp() - $subCheck->getTimestamp()) < 60) {
+                            break;
+                        } else {
+                            $streak = false;
+                        }
+                    }
+                }
+                var_dump($streak, $nextSub);
+
+                if ($nextSub !== null) {
+                    if ($streak) {
+                        $prevCheckDay = floor((new DateTime($prevSub['check_date']))->getTimestamp() / 86400);
+                        $nextCheckDay = floor((new DateTime($nextSub['check_date']))->getTimestamp() / 86400);
+                        $gap = $nextCheckDay - $prevCheckDay;
+                    } else {
+                        $gap = 1;
+                    }
+                    $this->conf->devPrint('Gap', $gap);
+                    $newOverallSubDays = (int) $prevSub['overall_sub_days'] + $gap;
+//                    $this->dbConn->query("UPDATE subscriptions SET overall_sub_days = $newOverallSubDays WHERE id = {$nextSub['id']}");
+                    var_dump("Set overall_sub_days to $newOverallSubDays for {$nextSub['id']}");
+                }
+            }
+        }
     }
 
     public function loadHeader()

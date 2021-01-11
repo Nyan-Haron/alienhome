@@ -49,7 +49,7 @@ class pollsController extends baseController
             WHERE po.poll_id = {$poll['id']}
             GROUP BY po.id ORDER BY voteCount DESC");
         while($option = $r->fetch_assoc()) {
-            $votePercent = ($option['voteCount']) ? round($sumVoteCount / $option['voteCount'] * 100, 2) : 0;
+            $votePercent = ($option['voteCount']) ? round($option['voteCount'] / $sumVoteCount * 100, 2) : 0;
             if ($poll['closed'] || $currentVote !== null || !$this->authInfo['sub']) {
                 $voteInfo = "Голосов: {$option['voteCount']} ($votePercent%)";
             } else {

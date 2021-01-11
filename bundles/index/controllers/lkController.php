@@ -107,7 +107,7 @@ class lkController extends baseController
                 'action' => ''
             ];
             if ($cumulativeSubDays) {
-                $cumulativeSubDays = $cumulativeSubDays + ($prevRow['isPositive'] ? $gap : 1);
+//                $cumulativeSubDays = $cumulativeSubDays + ($prevRow['isPositive'] ? $gap : 1);
                 $row['sub_overall'] = $cumulativeSubDays;
                 $row['sub_streak'] = $prevRow['isPositive'] ? ($prevRow['sub_streak'] + $gap) : 1;
                 $row['isPositive'] = true;

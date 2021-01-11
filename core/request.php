@@ -6,6 +6,7 @@ class Request
         '/' => 'index/index/index',
         '/auth' => 'index/auth/auth',
         '/bioadminr' => 'index/admin/index',
+        '/bioadminr/give_points' => 'index/admin/givePoints',
         '/bioadminr/polls' => 'index/admin/polls',
         '/bioadminr/polls/close' => 'index/admin/closePoll',
         '/bioadminr/polls/create' => 'index/admin/createPoll',
@@ -17,7 +18,13 @@ class Request
         '/lk' => 'index/lk/index',
         '/order_game' => 'index/index/orderGame',
         '/poll' => 'index/polls/index',
-        '/revive_game' => 'index/index/reviveGame'
+        '/r6s_wlr' => 'index/wlr/index',
+        '/r6s_wlr/forget' => 'index/wlr/forget',
+        '/r6s_wlr/lose' => 'index/wlr/lose',
+        '/r6s_wlr/moderate' => 'index/wlr/moderate',
+        '/r6s_wlr/win' => 'index/wlr/win',
+        '/revive_game' => 'index/index/reviveGame',
+        '/titles' => 'index/titles/index'
     ];
 
     public $get = [];
