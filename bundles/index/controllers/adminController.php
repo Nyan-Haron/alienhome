@@ -123,11 +123,24 @@ class adminController extends baseController
 
         if (!empty($this->request->post)) {
             $this->dbConn->query("UPDATE polls SET title = '{$this->request->post['pollTitle']}' WHERE id = $pollId");
-            $this->dbConn->query("DELETE FROM poll_options WHERE poll_id = $pollId");
 
-            foreach ($this->request->post['optionTitles'] as $key => $title) {
-                $description = $this->request->post['optionDescs'][$key];
-                $this->dbConn->query("INSERT INTO poll_options (poll_id, title, description) VALUES ($pollId, '$title', '$description')");
+            $saveOptions = [];
+            if (array_key_exists('optionTitles', $this->request->post)) {
+                foreach ($this->request->post['optionTitles'] as $key => $title) {
+                    $description = $this->request->post['optionDescs'][$key];
+                    $this->dbConn->query("UPDATE poll_options SET title = '$title', description = '$description' WHERE id = $key");
+                    $saveOptions[] = $key;
+                }
+            }
+
+            $saveOptionsStr = implode(',', $saveOptions);
+            $this->dbConn->query("DELETE FROM poll_options WHERE poll_id = $pollId AND id NOT IN ({$saveOptionsStr})");
+
+            if (array_key_exists('newOptionTitles', $this->request->post)) {
+                foreach ($this->request->post['newOptionTitles'] as $key => $title) {
+                    $description = $this->request->post['newOptionDescs'][$key];
+                    $this->dbConn->query("INSERT INTO poll_options (poll_id, title, description) VALUES ($pollId, '$title', '$description')");
+                }
             }
         }
 
@@ -144,14 +157,14 @@ class adminController extends baseController
             WHERE po.poll_id = $pollId
             GROUP BY po.id");
         while ($pollOption = $r->fetch_assoc()) {
-            $votePercent = ($pollOption['voteCount']) ? round($sumVoteCount / $pollOption['voteCount'] * 100, 2) : 0;
+            $votePercent = $sumVoteCount ? round($pollOption['voteCount'] / $sumVoteCount * 100, 2) : 0;
             $tableRows .= "
             <tr>
                 <td>
-                    <input type='text' name='optionTitles[]' value='{$pollOption['title']}'>
+                    <input type='text' name='optionTitles[{$pollOption['id']}]' value='{$pollOption['title']}'>
                     <div class='gameList'></div>
                 </td>
-                <td><input type='text' name='optionDescs[]' value='{$pollOption['description']}' style='width: 100%'></td>
+                <td><input type='text' name='optionDescs[{$pollOption['id']}]' value='{$pollOption['description']}' style='width: 100%'></td>
                 <td><button type='button' class='removeOption'>-</button></td>
                 <td>Голосов: {$pollOption['voteCount']} ($votePercent%)</td>
             </tr>

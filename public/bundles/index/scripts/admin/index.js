@@ -4,8 +4,8 @@ $(document).ready(function () {
     $('#addOption').click(function () {
         let newOption = optionTemplate.clone();
         newOption[0].removeAttribute('id');
-        newOption.find('.title')[0].setAttribute('name', 'optionTitles[]');
-        newOption.find('.desc')[0].setAttribute('name', 'optionDescs[]');
+        newOption.find('.title')[0].setAttribute('name', 'newOptionTitles[]');
+        newOption.find('.desc')[0].setAttribute('name', 'newOptionDescs[]');
         $('#lastRow').before(newOption);
     });
 

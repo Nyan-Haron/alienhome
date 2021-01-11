@@ -18,6 +18,7 @@ class Request
         '/lk' => 'index/lk/index',
         '/order_game' => 'index/index/orderGame',
         '/poll' => 'index/polls/index',
+        '/poll/load_json' => 'index/polls/loadPollJson',
         '/r6s_wlr' => 'index/wlr/index',
         '/r6s_wlr/forget' => 'index/wlr/forget',
         '/r6s_wlr/lose' => 'index/wlr/lose',

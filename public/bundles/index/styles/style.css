@@ -357,3 +357,31 @@ summary {
   border: 1px solid grey;
   padding: 5px;
 }
+
+.pollOption {
+    display: block;
+    border: 3px solid black;
+    margin: 10px;
+    padding: 5px;
+}
+.pollOption.chosen {
+    background-color: #00a2e8;
+}
+.pollOption .title, .pollOption .desc, .pollOption .voteInfo {
+    display: block;
+    text-align: center;
+}
+.pollOption .title {
+    font-size: 20px;
+    font-weight: bold;
+}
+.pollOption .desc {
+    font-size: 14px;
+    font-style: italic;
+}
+.pollOption .voteInfo {
+    margin-top: 5px;
+}
+.pollOption .voteInfo input {
+    display: none;
+}
