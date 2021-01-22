@@ -8,6 +8,14 @@
             <td>Название</td>
             <td><input type="text" name="pollTitle" value="{{pollTitle}}" style="width: 100%"></td>
         </tr>
+        <tr>
+            <td>Заглавный опрос</td>
+            <td><input type="checkbox" name="isMajor" {{isMajor}}></td>
+        </tr>
+        <tr>
+            <td>Только для сабов</td>
+            <td><input type="checkbox" name="isSubOnly" {{isSubOnly}}></td>
+        </tr>
         <tr id="pollOptionTemplate">
             <td width="300px">
                 <input type="text" class="title">

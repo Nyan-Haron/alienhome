@@ -122,7 +122,9 @@ class adminController extends baseController
         $pollId = $this->request->get['id'];
 
         if (!empty($this->request->post)) {
-            $this->dbConn->query("UPDATE polls SET title = '{$this->request->post['pollTitle']}' WHERE id = $pollId");
+            $isMajor = array_key_exists('isMajor', $this->request->post) ? 'TRUE' : 'FALSE';
+            $isSubOnly = array_key_exists('isSubOnly', $this->request->post) ? 'TRUE' : 'FALSE';
+            $this->dbConn->query("UPDATE polls SET title = '{$this->request->post['pollTitle']}', major = $isMajor, sub_only = $isSubOnly WHERE id = $pollId");
 
             $saveOptions = [];
             if (array_key_exists('optionTitles', $this->request->post)) {
@@ -173,6 +175,8 @@ class adminController extends baseController
 
         $this->request->setViewVariable('pollTitle', $poll['title']);
         $this->request->setViewVariable('tableRows', $tableRows);
+        $this->request->setViewVariable('isMajor', $poll['major'] ? 'checked' : '');
+        $this->request->setViewVariable('isSubOnly', $poll['sub_only'] ? 'checked' : '');
     }
 
     public function closePoll()

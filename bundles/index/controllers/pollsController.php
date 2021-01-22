@@ -13,7 +13,7 @@ class pollsController extends baseController
         $optionTile = file_get_contents($this->conf->getPath("$htmlPath/optionTile.html"));
 
         if (!isset($this->request->get['poll_id'])) {
-            $poll = $this->dbConn->query('SELECT id FROM polls ORDER BY open_date DESC')->fetch_assoc();
+            $poll = $this->dbConn->query('SELECT id FROM polls ORDER BY major DESC, open_date DESC')->fetch_assoc();
             header('Location: /poll?' . http_build_query(['poll_id' => $poll['id']]));
         } else {
             $poll = $this->dbConn
@@ -53,7 +53,7 @@ class pollsController extends baseController
             $voteInfo = "Голосов:
                     <span class='votesCount_{$option['id']}'>{$option['voteCount']}</span>
                     (<span class='votesPercent_{$option['id']}'>$votePercent</span>%)";
-            if (!$poll['closed'] && $currentVote === null && $this->authInfo['sub']) {
+            if (!$poll['closed'] && $currentVote === null && $this->authInfo['id'] && ($this->authInfo['sub'] || !$poll['sub_only'])) {
                 $voteInfo .= '<input type="radio" class="voteRadio" name="vote" value="{{optionId}}">';
                 $submitButton = '<button type="submit" id="pollSubmit">Подтвердить голос</button>';
             }
