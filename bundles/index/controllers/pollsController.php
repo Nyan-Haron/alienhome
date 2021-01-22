@@ -47,8 +47,19 @@ class pollsController extends baseController
         $r = $this->dbConn->query("SELECT po.*, COUNT(pv.user_twitch_id) AS voteCount FROM poll_options AS po
               LEFT JOIN poll_votes AS pv ON pv.poll_option_id = po.id
             WHERE po.poll_id = {$poll['id']}
-            GROUP BY po.id ORDER BY voteCount DESC");
+            GROUP BY po.id");
+        $optionsArr = [];
         while($option = $r->fetch_assoc()) {
+            $option['order'] = (float) $option['voteCount'] * 2;
+            if (strpos($option['title'], 'DANUNA') !== false) {
+                $option['order'] += 1;
+            }
+            $optionsArr[] = $option;
+        }
+
+        usort($optionsArr, function (array $a, array $b) { return $b['order'] - $a['order']; });
+
+        foreach ($optionsArr as $option) {
             $votePercent = $sumVoteCount ? round($option['voteCount'] / $sumVoteCount * 100, 2) : 0;
             $voteInfo = "Голосов:
                     <span class='votesCount_{$option['id']}'>{$option['voteCount']}</span>
