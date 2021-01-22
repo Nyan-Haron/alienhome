@@ -13,15 +13,10 @@ class Conf
     private $twitchAppSecret = '';
     private $authRedirectUri = '';
 
-    public function __construct($mode = 'prod')
+    public function __construct()
     {
         $this->setRoot($_SERVER['DOCUMENT_ROOT'] . '/..')
             ->setPublicFolder($_SERVER['DOCUMENT_ROOT']);
-
-        if ($mode == 'dev') {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-        }
 
         require_once $this->getPath('/conf.php');
         $conf = getBaseConf();
@@ -30,6 +25,11 @@ class Conf
         $this->setDb($conf['dbHost'], $conf['dbUser'], $conf['dbPwd'], $conf['dbName']);
         $this->setEnv($conf['env']);
         $this->setTwitchApp($conf['twitchAppClientId'], $conf['twitchAppSecret']);
+
+        if ($this->env == 'dev') {
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+        }
     }
 
     private function setPublicFolder($publicFolder)

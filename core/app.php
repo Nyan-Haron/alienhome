@@ -2,7 +2,7 @@
 
 class App
 {
-    public function start($mode)
+    public function start()
     {
         session_start();
 
@@ -10,7 +10,7 @@ class App
         require_once 'request.php';
         require_once 'db.php';
 
-        $conf = new Conf($mode);
+        $conf = new Conf();
 
         $this->includeOnce($conf->getPath('/bundles/baseController.php'));
         $this->includeOnce($conf->getPath('/bundles/helper.php'));
@@ -20,7 +20,7 @@ class App
         $request = new Request($_SERVER['REQUEST_URI'], $conf->getPath('/bundles/'));
         $db = new Db($conf);
         $request->setLayout(file_get_contents($conf->getPath('/public/bundles/index/views/layout.html')));
-        $request->setViewVariable('mode', $mode);
+        $request->setViewVariable('mode', $conf->getEnv());
         $request->setViewVariable('subList', '');
         $conf->devPrint('htmlInfo', sprintf(
             'Calling /bundles/index/views/%s/%s.html',
