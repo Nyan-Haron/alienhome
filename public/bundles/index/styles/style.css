@@ -1,3 +1,7 @@
+@font-face {
+    font-family: 'Furore';
+    src: url("/fonts/furore.ttf");
+}
 body {
     font-family: sans-serif;
 }
@@ -16,8 +20,12 @@ body {
     height: 100px;
 }
 #caption {
+    font-family: Furore;
     float: left;
-    /*color: red;*/
+}
+#caption a {
+    text-decoration: none;
+    color: black;
 }
 #authInfo {
     width: 230px;
@@ -26,6 +34,9 @@ body {
 }
 #logOut {
     float: right;
+}
+.mode_dev #caption a {
+    color: red;
 }
 
 /* ========== tile style ============*/
@@ -363,6 +374,10 @@ summary {
     border: 3px solid black;
     margin: 10px;
     padding: 5px;
+    cursor: pointer;
+}
+.pollOption:hover {
+    background-color: #eef;
 }
 .pollOption.chosen {
     background-color: #00a2e8;
@@ -372,8 +387,8 @@ summary {
     text-align: center;
 }
 .pollOption .title {
+    font-family: Furore;
     font-size: 20px;
-    font-weight: bold;
 }
 .pollOption .desc {
     font-size: 14px;
@@ -384,4 +399,12 @@ summary {
 }
 .pollOption .voteInfo input {
     display: none;
+}
+#pollSubmit {
+    display: block;
+    font-family: Furore;
+    padding: 5px;
+    margin: 10px;
+    width: calc(100% - 20px);
+    border: 3px solid green;
 }

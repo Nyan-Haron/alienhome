@@ -20,6 +20,7 @@ class App
         $request = new Request($_SERVER['REQUEST_URI'], $conf->getPath('/bundles/'));
         $db = new Db($conf);
         $request->setLayout(file_get_contents($conf->getPath('/public/bundles/index/views/layout.html')));
+        $request->setViewVariable('mode', $mode);
         $request->setViewVariable('subList', '');
         $conf->devPrint('htmlInfo', sprintf(
             'Calling /bundles/index/views/%s/%s.html',
@@ -45,7 +46,7 @@ class App
         /** @var baseController $controller */
         $controller = new $controllerName($db, $request, $conf);
 
-        if (!$controller->checkAuth() && $request->controller !== 'auth') {
+        if (!$controller->checkAuth() && $request->controller !== 'auth' && $request->needAuth) {
             header("Location: /login");
         }
         $controller->{$request->method}();

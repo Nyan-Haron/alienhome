@@ -9,13 +9,6 @@ class pollsController extends baseController
         $this->conf->devPrint('info', '/bundles/index/controllers/indexController->index() here');
         $this->loadHeader();
         $this->request->setViewVariable('page', 'Home Page');
-        if (!empty($this->authInfo)) {
-            $this->request->setViewVariable('userId', $this->authInfo['id']);
-            $this->request->setViewVariable('userName', $this->authInfo['name']);
-        }
-        if (!empty($this->authInfo['sub'])) {
-            $this->request->setViewVariable('subCheck', '<br/><span>You are subscribed to BioAlienR</span>');
-        }
 
         $optionTile = file_get_contents($this->conf->getPath("$htmlPath/optionTile.html"));
 
@@ -32,6 +25,8 @@ class pollsController extends baseController
             header('Location: /');
         }
 
+        $this->request->setViewVariable('page', $poll['title']);
+
         $currentVote = $this->dbConn
             ->query("SELECT * FROM poll_votes WHERE poll_id = {$poll['id']} AND user_twitch_id = {$this->authInfo['id']}")
             ->fetch_assoc();
@@ -42,7 +37,7 @@ class pollsController extends baseController
             if ($option !== null) {
                 $this->dbConn->query("INSERT INTO poll_votes (user_twitch_id, poll_id, poll_option_id) VALUES ({$this->authInfo['id']}, {$poll['id']}, $vote)");
             }
-            header('Location: /poll');
+            header('Location: /poll?poll_id=' . $poll['id']);
         }
 
         $sumVoteCount = (int) $this->dbConn->query("SELECT COUNT(*) FROM poll_votes WHERE poll_id = {$poll['id']}")->fetch_row()[0];
@@ -55,12 +50,11 @@ class pollsController extends baseController
             GROUP BY po.id ORDER BY voteCount DESC");
         while($option = $r->fetch_assoc()) {
             $votePercent = $sumVoteCount ? round($option['voteCount'] / $sumVoteCount * 100, 2) : 0;
-            if ($poll['closed'] || $currentVote !== null || !$this->authInfo['sub']) {
-                $voteInfo = "Голосов:
+            $voteInfo = "Голосов:
                     <span class='votesCount_{$option['id']}'>{$option['voteCount']}</span>
                     (<span class='votesPercent_{$option['id']}'>$votePercent</span>%)";
-            } else {
-                $voteInfo = '<input type="radio" class="voteRadio" name="vote" value="{{optionId}}">';
+            if (!$poll['closed'] && $currentVote === null && $this->authInfo['sub']) {
+                $voteInfo .= '<input type="radio" class="voteRadio" name="vote" value="{{optionId}}">';
                 $submitButton = '<button type="submit" id="pollSubmit">Подтвердить голос</button>';
             }
 
@@ -74,6 +68,8 @@ class pollsController extends baseController
         }
 
         $this->request->setViewVariable('title', $poll['title']);
+        $this->request->setViewVariable('alreadyVoted', $currentVote ? 'Вы уже проголосовали.' : '');
+        $this->request->setViewVariable('overallVotes', $sumVoteCount);
         $this->request->setViewVariable('options', $options);
         $this->request->setViewVariable('pollId', $poll['id']);
         $this->request->setViewVariable('submitButton', $submitButton);

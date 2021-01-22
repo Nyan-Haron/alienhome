@@ -8,26 +8,20 @@
 
 class baseController
 {
-    /**
-     * @var Db
-     */
-    var $dbConn;
-    /**
-     * @var Request
-     */
-    var $request;
-    /**
-     * @var Conf
-     */
-    var $conf;
-    /**
-     * @var array
-     */
-    var $authInfo = [];
-    /**
-     * @var bool
-     */
-    var $isAuth = false;
+    /** @var Db */
+    public $dbConn;
+    /** @var Request */
+    public $request;
+    /** @var Conf */
+    public $conf;
+    /** @var array */
+    public $authInfo = [
+        'id' => 0,
+        'name' => '',
+        'sub' => false
+    ];
+    /** @var bool */
+    public $isAuth = false;
 
     /**
      * baseController constructor.
@@ -235,5 +229,17 @@ class baseController
     public function loadHeader()
     {
         $this->request->setViewVariable('header', file_get_contents($this->conf->getPath('/public/bundles/index/views/header.html')));
+        $this->request->setViewVariable('subCheck', '');
+        $this->request->setViewVariable('authCheck', '<span>You are not logged in</span>');
+        $this->request->setViewVariable('logButton', '<a href="/login"><input type="button" value="login" /></a>');
+        if ($this->isAuth) {
+            $this->request->setViewVariable('authCheck', '<span>You are logged in as <a href="/lk" id="auth_username" data-id="{{userId}}">{{userName}}</a></span>');
+            $this->request->setViewVariable('logButton', '<a href="/logout"><input type="button" value="logout" /></a>');
+            $this->request->setViewVariable('userId', $this->authInfo['id']);
+            $this->request->setViewVariable('userName', $this->authInfo['name']);
+        }
+        if ($this->authInfo['sub']) {
+            $this->request->setViewVariable('subCheck', '<br/><span>You are subscribed to BioAlienR</span>');
+        }
     }
 }

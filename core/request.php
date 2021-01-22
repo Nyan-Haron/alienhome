@@ -17,6 +17,10 @@ class Request
         '/logout' => 'index/auth/logout',
         '/lk' => 'index/lk/index',
         '/order_game' => 'index/index/orderGame',
+        '/revive_game' => 'index/index/reviveGame',
+    ];
+
+    private $noAuthAccessRoutes = [
         '/poll' => 'index/polls/index',
         '/poll/load_json' => 'index/polls/loadPollJson',
         '/r6s_wlr' => 'index/wlr/index',
@@ -24,10 +28,10 @@ class Request
         '/r6s_wlr/lose' => 'index/wlr/lose',
         '/r6s_wlr/moderate' => 'index/wlr/moderate',
         '/r6s_wlr/win' => 'index/wlr/win',
-        '/revive_game' => 'index/index/reviveGame',
         '/titles' => 'index/titles/index'
     ];
 
+    public $needAuth = true;
     public $get = [];
     public $post = [];
     public $bundle = 'index';
@@ -48,22 +52,32 @@ class Request
     private function checkPath($path)
     {
         $truePath = '';
-        if (array_key_exists($path, $this->routes)) {
+        if (array_key_exists($path, $this->routes) || array_key_exists($path, $this->noAuthAccessRoutes)) {
             $truePath = $path;
         }
 
         if (strlen($path) > 1) {
             $path = preg_replace('/\/$/', '', $path);
-            if (array_key_exists($path, $this->routes)) {
+            if (array_key_exists($path, $this->routes) || array_key_exists($path, $this->noAuthAccessRoutes)) {
                 $truePath = $path;
             }
         }
         if ($truePath === '') exit('Wrong route');
 
-        $pathParams = explode('/', $this->routes[$truePath]);
-        $this->bundle = $pathParams[0];
-        $this->controller = $pathParams[1];
-        $this->method = $pathParams[2];
+        if (array_key_exists($path, $this->routes)) {
+            $pathParams = explode('/', $this->routes[$truePath]);
+            $this->bundle = $pathParams[0];
+            $this->controller = $pathParams[1];
+            $this->method = $pathParams[2];
+        }
+
+        if (array_key_exists($path, $this->noAuthAccessRoutes)) {
+            $this->needAuth = false;
+            $pathParams = explode('/', $this->noAuthAccessRoutes[$truePath]);
+            $this->bundle = $pathParams[0];
+            $this->controller = $pathParams[1];
+            $this->method = $pathParams[2];
+        }
 
         return true;
     }
