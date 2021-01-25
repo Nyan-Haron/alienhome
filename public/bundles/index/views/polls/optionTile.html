@@ -1,5 +1,8 @@
-<label class="pollOption {{chosen}}">
-    <span class="title">{{title}}</span>
-    <span class="desc">{{desc}}</span>
-    <span class="voteInfo">{{vote}}</span>
+<label class="pollOption option_{{id}} {{chosen}}">
+    <div class="progressBar" style="width: {{width}}%"></div>
+    <div class="content">
+        <span class="title">{{title}}</span>
+        <span class="desc">&nbsp;{{desc}}</span>
+        <span class="voteInfo">{{vote}}</span>
+    </div>
 </label>

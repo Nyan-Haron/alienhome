@@ -17,7 +17,7 @@ class pollsController extends baseController
             header('Location: /poll?' . http_build_query(['poll_id' => $poll['id']]));
         } else {
             $poll = $this->dbConn
-                ->query('SELECT *, close_date IS NULL AS closed FROM polls WHERE id = ' . ((int) $this->request->get['poll_id']))
+                ->query('SELECT *, close_date IS NOT NULL AS closed FROM polls WHERE id = ' . ((int) $this->request->get['poll_id']))
                 ->fetch_assoc();
         }
 
@@ -62,14 +62,16 @@ class pollsController extends baseController
         foreach ($optionsArr as $option) {
             $votePercent = $sumVoteCount ? round($option['voteCount'] / $sumVoteCount * 100, 2) : 0;
             $voteInfo = "Голосов:
-                    <span class='votesCount_{$option['id']}'>{$option['voteCount']}</span>
-                    (<span class='votesPercent_{$option['id']}'>$votePercent</span>%)";
+                    <span class='votesCount'>{$option['voteCount']}</span>
+                    (<span class='votesPercent'>$votePercent</span>%)";
             if (!$poll['closed'] && $currentVote === null && $this->authInfo['id'] && ($this->authInfo['sub'] || !$poll['sub_only'])) {
                 $voteInfo .= '<input type="radio" class="voteRadio" name="vote" value="{{optionId}}">';
                 $submitButton = '<button type="submit" id="pollSubmit">Подтвердить голос</button>';
             }
 
             $options .= $this->request->renderLayout($optionTile, [
+                'id' => $option['id'],
+                'width' => $votePercent,
                 'title' => $option['title'],
                 'desc' => $option['description'],
                 'optionId' => $option['id'],
@@ -78,7 +80,12 @@ class pollsController extends baseController
             ]);
         }
 
-        $this->request->setViewVariable('title', $poll['title']);
+        $title = $poll['title'];
+        if ($poll['closed']) {
+            $title .= ' [Голосование закрыто]';
+        }
+
+        $this->request->setViewVariable('title', $title);
         $this->request->setViewVariable('alreadyVoted', $currentVote ? 'Вы уже проголосовали.' : '');
         $this->request->setViewVariable('overallVotes', $sumVoteCount);
         $this->request->setViewVariable('options', $options);

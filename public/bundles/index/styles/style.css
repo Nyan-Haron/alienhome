@@ -371,20 +371,36 @@ summary {
 
 .pollOption {
     display: block;
-    border: 3px solid black;
+    border: 3px solid #505050;
+    color: #505050;
     margin: 10px;
-    padding: 5px;
     cursor: pointer;
+    position: relative;
+    height: 75px;
 }
 .pollOption:hover {
     background-color: #eef;
 }
+.pollOption .content {
+    position: absolute;
+    padding: 5px;
+    height: calc(100% - 10px);
+    width: calc(100% - 10px);
+}
+.pollOption .progressBar {
+    position: absolute;
+    height: 100%;
+    background-color: #c1ffc1;
+}
 .pollOption.chosen {
-    background-color: #00a2e8;
+    border: 3px solid black;
+    box-shadow: 5px 5px 3px 0 black;
+    color: black;
 }
 .pollOption .title, .pollOption .desc, .pollOption .voteInfo {
     display: block;
     text-align: center;
+    z-index: 100;
 }
 .pollOption .title {
     font-family: Furore;
@@ -407,4 +423,5 @@ summary {
     margin: 10px;
     width: calc(100% - 20px);
     border: 3px solid green;
+    cursor: pointer;
 }

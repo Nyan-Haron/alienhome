@@ -1,7 +1,7 @@
 <input type="hidden" id="pollId" value="{{pollId}}">
 <div>
     <h2>{{title}}</h2>
-    <h4>{{alreadyVoted}} Всего голосов: {{overallVotes}}</h4>
+    <h4>{{alreadyVoted}} Всего голосов: <span class="overallVotes">{{overallVotes}}</span></h4>
     <form action="" method="post">
         {{options}}
         {{submitButton}}
@@ -26,9 +26,12 @@
 
                     for (let option in data) {
                         let votesCount = data[option];
-                        $('.votesCount_' + option).html(votesCount);
-                        $('.votesPercent_' + option).html(Math.round(votesCount / votesSum * 10000) / 100);
+                        let percent = Math.round(votesCount / votesSum * 10000) / 100;
+                        $('.pollOption.option_' + option + ' .votesCount').html(votesCount);
+                        $('.pollOption.option_' + option + ' .votesPercent').html(percent);
+                        $('.pollOption.option_' + option + ' .progressBar').css('width', percent + '%');
                     }
+                    $('.overallVotes').html(votesSum);
                 }
             })
         }, 5000);

@@ -37,7 +37,6 @@ class lkController extends baseController
         ksort($checkDays);
 
         $pointsGained = 0;
-        $cumulativeSubDays = 0;
         $tableRows = $prehistoricTableRows = [];
         $isFirstSubAfterThreshold = false;
         $prevRow = [
