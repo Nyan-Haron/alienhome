@@ -17,7 +17,7 @@ class pollsController extends baseController
             header('Location: /poll?' . http_build_query(['poll_id' => $poll['id']]));
         } else {
             $poll = $this->dbConn
-                ->query('SELECT *, close_date IS NOT NULL AS closed FROM polls WHERE id = ' . ((int) $this->request->get['poll_id']))
+                ->query('SELECT *, IF(close_date, TRUE, FALSE) AS closed FROM polls WHERE id = ' . ((int) $this->request->get['poll_id']))
                 ->fetch_assoc();
         }
 
