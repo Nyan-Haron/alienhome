@@ -317,7 +317,7 @@ class adminController extends baseController
 
                         if ($checkTimestamp > $thresholdDate) {
                             $pointsGained += 3;
-//                            $this->dbConn->query("UPDATE users SET sub_points = sub_points + 3 WHERE twitch_id = {$sub['twitch_id']}");
+                            $this->dbConn->query("UPDATE users SET sub_points = sub_points + 3 WHERE twitch_id = {$sub['twitch_id']}");
                             $isFirstSubAfterThreshold = true;
                         }
                     }
