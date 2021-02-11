@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>BioAlienR Win-Lose Rate</title>
-    <meta http-equiv="refresh" content="5">
     <style>
         @font-face {
             font-family: 'Furore';
@@ -16,7 +15,19 @@
         }
     </style>
 </head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    setInterval(function () {
+        $.get({
+            url: '/r6s_wlr/load',
+            dataType: 'json',
+            success: function (data) {
+                $('body').html(data.win + '&ndash;' + data.lose);
+            }
+        });
+    }, 5000);
+</script>
 <body>
-{{win}}&ndash;{{lose}}
+Loading...
 </body>
 </html>

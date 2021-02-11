@@ -67,4 +67,11 @@ class wlrController extends baseController
 
         printf("%s // Текущий счёт: %d-%d", $phrase, $rate['win'], $rate['lose']);
     }
+
+    public function load()
+    {
+        $this->request->setLayout('');
+        $rate = $this->dbConn->query("SELECT * FROM siege_win_rate")->fetch_assoc();
+        echo json_encode(['win' => $rate['win'], 'lose' => $rate['lose']]);
+    }
 }

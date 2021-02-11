@@ -25,6 +25,7 @@ class Request
         '/poll/load_json' => 'index/polls/loadPollJson',
         '/r6s_wlr' => 'index/wlr/index',
         '/r6s_wlr/forget' => 'index/wlr/forget',
+        '/r6s_wlr/load' => 'index/wlr/load',
         '/r6s_wlr/lose' => 'index/wlr/lose',
         '/r6s_wlr/moderate' => 'index/wlr/moderate',
         '/r6s_wlr/win' => 'index/wlr/win',
