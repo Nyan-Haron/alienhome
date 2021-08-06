@@ -1,7 +1,7 @@
 <input type="hidden" id="pollId" value="{{pollId}}">
 <div>
     <h2>{{title}}</h2>
-    <h4>{{alreadyVoted}} Всего голосов: <span class="overallVotes">{{overallVotes}}</span></h4>
+    <h4>{{alreadyVoted}} Всего голосов: <span class="overallVotes">{{overallVotes}}</span>, суммарный вес: <span class="sumWeight">{{sumWeight}}</span></h4>
     <form action="" method="post">
         {{options}}
         {{submitButton}}
@@ -18,20 +18,23 @@
                 data: {poll_id: pollId},
                 dataType: 'json',
                 success: function (data) {
-                    let votesSum = 0;
+                    let sumVotes = 0;
+                    let sumWeight = 0;
                     for (let option in data) {
-                        let votesCount = data[option];
-                        votesSum += parseInt(votesCount);
+                        let option = data[option];
+                        sumVotes += parseInt(option['count']);
+                        sumWeight += parseInt(option['weight']);
                     }
 
                     for (let option in data) {
-                        let votesCount = data[option];
-                        let percent = Math.round(votesCount / votesSum * 10000) / 100;
-                        $('.pollOption.option_' + option + ' .votesCount').html(votesCount);
+                        let weight = data[option]['weight'];
+                        let percent = Math.round(weight / sumWeight * 10000) / 100;
+                        $('.pollOption.option_' + option + ' .votesCount').html(weight);
                         $('.pollOption.option_' + option + ' .votesPercent').html(percent);
                         $('.pollOption.option_' + option + ' .progressBar').css('width', percent + '%');
                     }
-                    $('.overallVotes').html(votesSum);
+                    $('.overallVotes').html(sumVotes);
+                    $('.sumWeight').html(sumWeight);
                 }
             })
         }, 5000);

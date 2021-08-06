@@ -163,8 +163,12 @@ img {
 @media (max-width: 910px) {
 
     body {
-        width: 100vw;
+        width: calc(98vw - 16px);
         padding: 1vw;
+    }
+
+    #body {
+        width: 100%;
     }
 
     .authImage, #loginLink {

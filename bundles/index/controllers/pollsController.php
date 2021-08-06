@@ -55,7 +55,9 @@ class pollsController extends baseController
             header('Location: /poll?poll_id=' . $poll['id']);
         }
 
-        $sumVoteCount = (int) $this->dbConn->query("SELECT COUNT(*) FROM poll_votes WHERE poll_id = {$poll['id']}")->fetch_row()[0];
+        $sums = $this->dbConn->query("SELECT COUNT(*), SUM(weight) FROM poll_votes WHERE poll_id = {$poll['id']}")->fetch_row();
+        $sumVoteCount = (int) $sums[0];
+        $sumVoteWeight = (int) $sums[1];
 
         $submitButton = '';
         $options = '';
@@ -75,7 +77,7 @@ class pollsController extends baseController
         usort($optionsArr, function (array $a, array $b) { return $b['order'] - $a['order']; });
 
         foreach ($optionsArr as $option) {
-            $votePercent = $sumVoteCount ? round($option['voteCount'] / $sumVoteCount * 100, 2) : 0;
+            $votePercent = $sumVoteWeight ? round($option['voteCount'] / $sumVoteWeight * 100, 2) : 0;
             $voteInfo = "Голосов:
                     <span class='votesCount'>{$option['voteCount']}</span>
                     (<span class='votesPercent'>$votePercent</span>%)";
@@ -103,6 +105,7 @@ class pollsController extends baseController
         $this->request->setViewVariable('title', $title);
         $this->request->setViewVariable('alreadyVoted', $currentVote ? 'Вы уже проголосовали.' : '');
         $this->request->setViewVariable('overallVotes', $sumVoteCount);
+        $this->request->setViewVariable('sumWeight', $sumVoteWeight);
         $this->request->setViewVariable('options', $options);
         $this->request->setViewVariable('pollId', $poll['id']);
         $this->request->setViewVariable('submitButton', $submitButton);
@@ -115,9 +118,12 @@ class pollsController extends baseController
         if (array_key_exists('poll_id', $this->request->get)) {
             $pollId = $this->request->get['poll_id'];
             $votesArr = [];
-            $r = $this->dbConn->query("SELECT COUNT(*) AS votesCount, poll_option_id FROM poll_votes WHERE poll_id = $pollId GROUP BY poll_option_id");
+            $r = $this->dbConn->query("SELECT COUNT(*) AS votesCount, SUM(weight) AS sumWeight, poll_option_id FROM poll_votes WHERE poll_id = $pollId GROUP BY poll_option_id");
             while ($vote = $r->fetch_assoc()) {
-                $votesArr[$vote['poll_option_id']] = $vote['votesCount'];
+                $votesArr[$vote['poll_option_id']] = [
+                    'count' => $vote['votesCount'],
+                    'weight' => $vote['sumWeight']
+                ];
             }
 
             print(json_encode($votesArr));
