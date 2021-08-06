@@ -23,6 +23,11 @@ class baseController
     /** @var bool */
     public $isAuth = false;
 
+    /** @var int BioAlienR's twitch ID */
+    public $coolGuy = 40955336;
+    /** @var int Ice_Haron's twitch ID */
+    public $kewlProgrammer = 82304594;
+
     /**
      * baseController constructor.
      * @param $dbConn mysqli
@@ -66,10 +71,10 @@ class baseController
      */
     public function checkSub($forced = false)
     {
-        $subChecker = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = 40955336")->fetch_assoc();
+        $subChecker = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$this->coolGuy}")->fetch_assoc();
 
-//        if ($this->isAuth && $this->authInfo['id'] == '82304594') { // Харон
-        if ($this->isAuth && $this->authInfo['id'] == '40955336') { // Илья
+//        if ($this->isAuth && $this->authInfo['id'] == $this->kewlProgrammer) {
+        if ($this->isAuth && $this->authInfo['id'] == $this->coolGuy) {
 
             if(strtotime($subChecker['last_sub_date']) + 60*60*12 < time() || ($forced && strtotime($subChecker['last_sub_date']) + 60*10 < time())) {
                 $subList = '<p>Привет, Илья! Проверяю твоих сабов.</p><ul>';
@@ -81,8 +86,8 @@ class baseController
                 $subCount = 0;
                 $pageVolume = 0;
                 do {
-//                    $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=82304594&after=$cursor");
-                    $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id=40955336&after=$cursor");
+//                    $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id={$this->kewlProgrammer}&after=$cursor");
+                    $subCheck = curl_init("https://api.twitch.tv/helix/subscriptions?broadcaster_id={$this->coolGuy}&after=$cursor");
                     curl_setopt(
                         $subCheck,
                         CURLOPT_HTTPHEADER,
@@ -112,8 +117,9 @@ class baseController
                                 } else {
                                     $cumulativeSubDays = 1;
                                 }
-                                $this->dbConn->query("INSERT INTO subscriptions (user_twitch_id, overall_sub_days) VALUES ('{$subCheckUser['twitch_id']}', {$cumulativeSubDays})");
-                                $this->dbConn->query("UPDATE users SET last_sub_date = NOW() WHERE twitch_id = {$subCheckUser['twitch_id']}");
+                                $gifterId = $sub['gifter_id'] ?: 'NULL';
+                                $this->dbConn->query("INSERT INTO subscriptions (user_twitch_id, overall_sub_days, tier, gifter_id) VALUES ('{$subCheckUser['twitch_id']}', {$cumulativeSubDays}, {$sub['tier']}, {$gifterId})");
+                                $this->dbConn->query("UPDATE users SET last_sub_date = NOW(), last_sub_tier = {$sub['tier']} WHERE twitch_id = {$subCheckUser['twitch_id']}");
                                 $subList .= "<li>{$subCheckUser['username']} ({$subCheckUser['twitch_id']}) &mdash; $cumulativeSubDays дней</li>";
                             }
                         }
@@ -162,6 +168,22 @@ class baseController
         return false;
     }
 
+    public function getCurrentSubInfo($userTwitchId = 0)
+    {
+        $subChecker = $this->dbConn->query("SELECT * FROM users WHERE twitch_id = {$this->coolGuy}")->fetch_assoc();
+        if ($userTwitchId === 0) {
+            $userTwitchId = $_SESSION['id'];
+        }
+
+        $subInfo = $this->dbConn->query("SELECT * FROM subscriptions WHERE user_twitch_id = $userTwitchId ORDER BY check_date DESC LIMIT 1")->fetch_assoc();
+
+        if (strtotime($subInfo['check_date']) >= strtotime($subChecker['last_sub_date']) - 60*60) {
+            return $subInfo;
+        }
+
+        return null;
+    }
+
     protected function fixOverallSubDays() {
 
 //        $r = $this->dbConn->query('SELECT * FROM users WHERE twitch_id != ""');
@@ -176,7 +198,7 @@ class baseController
 //            }
 //        }
 
-        $r = $this->dbConn->query('SELECT * FROM subscriptions WHERE user_twitch_id = 40955336 ORDER BY check_date ASC');
+        $r = $this->dbConn->query("SELECT * FROM subscriptions WHERE user_twitch_id = {$this->coolGuy} ORDER BY check_date ASC");
         $subChecks = [];
         while ($check = $r->fetch_assoc()) {
             $subChecks[] = new DateTime($check['check_date']);

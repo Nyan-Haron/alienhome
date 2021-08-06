@@ -24,7 +24,7 @@ class lkController extends baseController
         }
 
         $checkDays = [];
-        $d = $this->dbConn->query("SELECT DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day FROM subscriptions WHERE user_twitch_id = 40955336 ORDER BY check_date ASC");
+        $d = $this->dbConn->query("SELECT DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day FROM subscriptions WHERE user_twitch_id = {$this->coolGuy} ORDER BY check_date ASC");
         while ($checkDate = $d->fetch_assoc()) {
             $checkDays[$checkDate['check_day']] = 0;
         }

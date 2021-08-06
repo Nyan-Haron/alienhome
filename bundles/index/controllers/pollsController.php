@@ -35,7 +35,22 @@ class pollsController extends baseController
             $vote = $this->request->post['vote'];
             $option = $this->dbConn->query("SELECT * FROM poll_options WHERE poll_id = {$poll['id']} AND id = $vote")->fetch_assoc();
             if ($option !== null) {
-                $this->dbConn->query("INSERT INTO poll_votes (user_twitch_id, poll_id, poll_option_id) VALUES ({$this->authInfo['id']}, {$poll['id']}, $vote)");
+                $subInfo = $this->getCurrentSubInfo($this->authInfo['id']);
+                $weight = 1;
+                if ($subInfo !== null) {
+                    switch ($subInfo['tier']) {
+                        case '1000':
+                            $weight = 1;
+                            break;
+                        case '2000':
+                            $weight = 2;
+                            break;
+                        case '3000':
+                            $weight = 3;
+                            break;
+                    }
+                }
+                $this->dbConn->query("INSERT INTO poll_votes (user_twitch_id, poll_id, poll_option_id, weight) VALUES ({$this->authInfo['id']}, {$poll['id']}, $vote, $weight)");
             }
             header('Location: /poll?poll_id=' . $poll['id']);
         }
@@ -44,7 +59,7 @@ class pollsController extends baseController
 
         $submitButton = '';
         $options = '';
-        $r = $this->dbConn->query("SELECT po.*, COUNT(pv.user_twitch_id) AS voteCount FROM poll_options AS po
+        $r = $this->dbConn->query("SELECT po.*, SUM(pv.weight) AS voteCount FROM poll_options AS po
               LEFT JOIN poll_votes AS pv ON pv.poll_option_id = po.id
             WHERE po.poll_id = {$poll['id']}
             GROUP BY po.id");

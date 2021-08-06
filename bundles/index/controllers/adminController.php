@@ -13,7 +13,7 @@ class adminController extends baseController
         $this->request->setViewVariable('header', '');
 
         $checkDays = [];
-        $d = $this->dbConn->query("SELECT DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day FROM subscriptions WHERE user_twitch_id = 40955336 AND granted_point = FALSE ORDER BY check_date ASC");
+        $d = $this->dbConn->query("SELECT DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day FROM subscriptions WHERE user_twitch_id = {$this->coolGuy} AND granted_point = FALSE ORDER BY check_date ASC");
         while ($checkDate = $d->fetch_assoc()) {
             $checkDays[$checkDate['check_day']] = 0;
         }
@@ -41,7 +41,7 @@ class adminController extends baseController
             }
         }
 
-        if ($_SESSION['id'] === "40955336" || $_SESSION['id'] === "82304594" || $_SESSION['id'] === "50267699") {
+        if ((int) $_SESSION['id'] === $this->coolGuy || (int) $_SESSION['id'] === $this->kewlProgrammer || $_SESSION['id'] === "50267699") {
             $q = $this->dbConn->query("SELECT * FROM statuses");
             $statuses = [];
             while ($overallSubDays = $q->fetch_assoc()) {
@@ -86,7 +86,7 @@ class adminController extends baseController
         $this->request->setViewVariable('page', 'Опросы');
         $this->request->setViewVariable('header', '');
 
-        if ($_SESSION['id'] === "40955336" || $_SESSION['id'] === "82304594" || $_SESSION['id'] === "50267699") {
+        if ((int) $_SESSION['id'] === $this->coolGuy || (int) $_SESSION['id'] === $this->kewlProgrammer || $_SESSION['id'] === "50267699" /* Nyanglitch */) {
             $tableRows = '';
             $r = $this->dbConn->query('SELECT * FROM polls');
             while ($row = $r->fetch_assoc()) {
@@ -207,172 +207,192 @@ class adminController extends baseController
         $this->request->setViewVariable('subList', '');
         $this->request->setViewVariable('body', '');
 
+        $pointsInfo = '';
+
+        if ($this->isAuth && $this->authInfo['id'] == $this->coolGuy) {
+            $pointsInfo .= $this->refreshPoints(true);
+        } elseif ($this->isAuth && $this->authInfo['id'] == $this->kewlProgrammer) {
+            $pointsInfo .= $this->refreshPoints(false);
+        }
+        $this->request->setViewVariable('body', $pointsInfo);
+    }
+
+    private function refreshPoints($givePoints = false)
+    {
         $checkDays = [];
-        $d = $this->dbConn->query("SELECT DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day FROM subscriptions WHERE user_twitch_id = 40955336 AND granted_point = FALSE ORDER BY check_date ASC");
+        $d = $this->dbConn->query("SELECT DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day FROM subscriptions WHERE user_twitch_id = {$this->coolGuy} AND granted_point = FALSE ORDER BY check_date ASC");
         while ($checkDate = $d->fetch_assoc()) {
             $checkDays[$checkDate['check_day']] = 0;
         }
 
-//        if ($this->isAuth && $this->authInfo['id'] == '82304594') { // Харон
-        if ($this->isAuth && $this->authInfo['id'] == '40955336') { // Илья
-            $thresholdDate = 1570838400; // 12.10.19 - дата ввода новой системы счёта поинтов
-            $reviveThresholdDate = 1559520000; // 03.06.19 - дата увеличения стоимости ревайва
-            $tableRows = [];
-            $drawUsers = [];
-            $q = $this->dbConn->query("SELECT * FROM users WHERE last_sub_date IS NOT NULL");
-            while ($sub = $q->fetch_assoc()) {
-                $personalCheckDays = $checkDays;
-                $d = $this->dbConn->query("SELECT id, DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day, overall_sub_days FROM subscriptions WHERE user_twitch_id = {$sub['twitch_id']} AND granted_point = FALSE ORDER BY check_date ASC");
-                $firstOverallSubDays = 0;
-                while ($subDate = $d->fetch_assoc()) {
-                    $personalCheckDays[$subDate['check_day']] = $subDate['overall_sub_days'];
-                    if ($firstOverallSubDays === 0) {
-                        $firstOverallSubDays = $subDate['overall_sub_days'];
+        $thresholdDate = 1570838400; // 12.10.19 - дата ввода новой системы счёта поинтов
+        $reviveThresholdDate = 1559520000; // 03.06.19 - дата увеличения стоимости ревайва
+        $tableRows = [];
+        $drawUsers = [];
+        $q = $this->dbConn->query("SELECT * FROM users WHERE last_sub_date IS NOT NULL");
+        while ($sub = $q->fetch_assoc()) {
+            $personalCheckDays = $checkDays;
+            $d = $this->dbConn->query("SELECT id, DATE_FORMAT(check_date, '%Y-%m-%d') AS check_day, overall_sub_days FROM subscriptions WHERE user_twitch_id = {$sub['twitch_id']} AND granted_point = FALSE ORDER BY check_date ASC");
+            $firstOverallSubDays = 0;
+            while ($subDate = $d->fetch_assoc()) {
+                $personalCheckDays[$subDate['check_day']] = $subDate['overall_sub_days'];
+                if ($firstOverallSubDays === 0) {
+                    $firstOverallSubDays = $subDate['overall_sub_days'];
+                }
+            }
+
+            ksort($personalCheckDays);
+
+            $pointsGained = floor($firstOverallSubDays / 30);
+            $isFirstSubAfterThreshold = false;
+            $prevRow = [
+                'timestamp' => 0,
+                'date' => '',
+                'sub_overall' => '-',
+                'sub_streak' => '-',
+                'event' => '',
+                'isPositive' => false
+            ];
+
+            // Расчёт затрат поинтов
+            $a = $this->dbConn->query("SELECT a.*, g.title FROM actions AS a JOIN games AS g ON g.id = a.game WHERE a.author_id = {$sub['twitch_id']} ORDER BY a.date ASC");
+            $actualUsedPoints = 0;
+            $overallUsedPoints = 0;
+            while ($action = $a->fetch_assoc()) {
+                $row = [
+                    'date' => $action['date'],
+                    'sub_overall' => '',
+                    'sub_streak' => '',
+                    'event' => '',
+                ];
+
+                $pointsUsage = 1;
+                if ($action['action_type'] == 'revive') {
+                    $pointsUsage++;
+                    if (strtotime($action['date']) > $reviveThresholdDate) {
+                        $pointsUsage++;
                     }
                 }
+                $row['event'] = "-$pointsUsage поинт";
 
-                ksort($personalCheckDays);
+                $overallUsedPoints += $pointsUsage;
+                if (strtotime($action['date']) >= $thresholdDate) {
+                    $actualUsedPoints += $pointsUsage;
+//                echo("{$sub['username']} {$action['date']} -{$pointsUsage} point <br>");
+                    /*
+                    $this->dbConn->query("UPDATE users SET sub_points = sub_points - {$pointsUsage} WHERE twitch_id = {$sub['twitch_id']}");
+                    $tableRows[$sub['username']][] = $row;
+                    */
+                }
+            }
 
-                $pointsGained = floor($firstOverallSubDays / 30);
-                $cumulativeSubDays = 0;
-                $isFirstSubAfterThreshold = false;
-                $prevRow = [
-                    'timestamp' => 0,
-                    'date' => '',
+            if ($sub['sub_points'] !== '0' ||
+                $this->dbConn->query("SELECT id FROM subscriptions WHERE user_twitch_id = {$sub['twitch_id']} AND check_date < '" . array_keys($checkDays)[0] . "'")->fetch_array() !== null ||
+                $this->dbConn->query("SELECT id FROM actions WHERE author_id = {$sub['twitch_id']} AND date < '" . array_keys($checkDays)[0] . "'")->fetch_array() !== null
+            ) {
+//            echo "{$sub['username']} subbed before " . array_keys($checkDays)[0] . "<br>";
+                $isFirstSub = false;
+            } else {
+                $isFirstSub = true;
+            }
+
+            foreach ($personalCheckDays as $checkDay => $cumulativeSubDays) {
+                $checkTimestamp = strtotime($checkDay);
+                $gap = $prevRow['timestamp'] === 0 ? 0 : ($checkTimestamp - $prevRow['timestamp']) / 86400;
+                $row = [
+                    'timestamp' => $checkTimestamp,
+                    'date' => $checkDay,
                     'sub_overall' => '-',
                     'sub_streak' => '-',
                     'event' => '',
                     'isPositive' => false
                 ];
-
-                // Расчёт затрат поинтов
-                $a = $this->dbConn->query("SELECT a.*, g.title FROM actions AS a JOIN games AS g ON g.id = a.game WHERE a.author_id = {$sub['twitch_id']} ORDER BY a.date ASC");
-                $actualUsedPoints = 0;
-                $overallUsedPoints = 0;
-                while ($action = $a->fetch_assoc()) {
-                    $row = [
-                        'date' => $action['date'],
-                        'sub_overall' => '',
-                        'sub_streak' => '',
-                        'event' => '',
-                    ];
-
-                    $pointsUsage = 1;
-                    if ($action['action_type'] == 'revive') {
-                        $pointsUsage++;
-                        if (strtotime($action['date']) > $reviveThresholdDate) {
-                            $pointsUsage++;
-                        }
-                    }
-                    $row['event'] = "-$pointsUsage поинт";
-
-                    $overallUsedPoints += $pointsUsage;
-                    if (strtotime($action['date']) >= $thresholdDate) {
-                        $actualUsedPoints += $pointsUsage;
-//                echo("{$sub['username']} {$action['date']} -{$pointsUsage} point <br>");
-                        /*
-                        $this->dbConn->query("UPDATE users SET sub_points = sub_points - {$pointsUsage} WHERE twitch_id = {$sub['twitch_id']}");
-                        $tableRows[$sub['username']][] = $row;
-                        */
-                    }
-                }
-
-                if ($sub['sub_points'] !== '0' ||
-                    $this->dbConn->query("SELECT id FROM subscriptions WHERE user_twitch_id = {$sub['twitch_id']} AND check_date < '" . array_keys($checkDays)[0] . "'")->fetch_array() !== null ||
-                    $this->dbConn->query("SELECT id FROM actions WHERE author_id = {$sub['twitch_id']} AND date < '" . array_keys($checkDays)[0] . "'")->fetch_array() !== null
-                ) {
-//            echo "{$sub['username']} subbed before " . array_keys($checkDays)[0] . "<br>";
-                    $isFirstSub = false;
-                } else {
-                    $isFirstSub = true;
-                }
-
-                foreach ($personalCheckDays as $checkDay => $cumulativeSubDays) {
-                    $checkTimestamp = strtotime($checkDay);
-                    $gap = $prevRow['timestamp'] === 0 ? 0 : ($checkTimestamp - $prevRow['timestamp']) / 86400;
-                    $row = [
-                        'timestamp' => $checkTimestamp,
-                        'date' => $checkDay,
-                        'sub_overall' => '-',
-                        'sub_streak' => '-',
-                        'event' => '',
-                        'isPositive' => false
-                    ];
-                    if ($cumulativeSubDays > 0) {
-//                $cumulativeSubDays = $cumulativeSubDays + ($prevRow['isPositive'] ? $gap : 1);
-                        $row['sub_overall'] = $cumulativeSubDays;
-                        $row['sub_streak'] = $prevRow['isPositive'] ? ($prevRow['sub_streak'] + $gap) : 1;
-                        $drawUsers[$sub['username']] = true;
-                        $row['isPositive'] = true;
+                if ($cumulativeSubDays > 0) {
+                    $row['sub_overall'] = $cumulativeSubDays;
+                    $row['sub_streak'] = $prevRow['isPositive'] ? ($prevRow['sub_streak'] + $gap) : 1;
+                    $drawUsers[$sub['username']] = true;
+                    $row['isPositive'] = true;
 //                $this->dbConn->query("UPDATE subscriptions SET overall_sub_days = {$cumulativeSubDays} WHERE user_twitch_id = {$sub['twitch_id']} AND DATE_FORMAT(check_date, '%Y-%m-%d') = '$checkDay'");
-                    } else {
+                } else {
 //                echo("{$sub['username']}_no_sub_true $checkDay <br>");
+                    if ($givePoints) {
                         $this->dbConn->query("UPDATE subscriptions SET granted_point = TRUE WHERE user_twitch_id = {$sub['twitch_id']} AND DATE_FORMAT(check_date, '%Y-%m-%d') <= '$checkDay' AND granted_point = FALSE");
-                        $row['event'] .= $prevRow['isPositive'] ? ' Стрик прерван' : '';
                     }
+                    $row['event'] .= $prevRow['isPositive'] ? ' Стрик прерван' : '';
+                }
 
-                    if ($cumulativeSubDays > 0 && $isFirstSub) {
-                        $row['event'] = '+3 поинт';
-                        $isFirstSub = false;
+                if ($cumulativeSubDays > 0 && $isFirstSub) {
+                    $row['event'] = '+3 поинт';
+                    $isFirstSub = false;
 
-                        if ($checkTimestamp > $thresholdDate) {
-                            $pointsGained += 3;
+                    if ($checkTimestamp > $thresholdDate) {
+                        $pointsGained += 3;
+                        if ($givePoints) {
                             $this->dbConn->query("UPDATE users SET sub_points = sub_points + 3 WHERE twitch_id = {$sub['twitch_id']}");
-                            $isFirstSubAfterThreshold = true;
                         }
+                        $isFirstSubAfterThreshold = true;
                     }
+                }
 
-                    if ($isFirstSubAfterThreshold) $adaptedPoints = $pointsGained - 2;
-                    else $adaptedPoints = $pointsGained + 1;
+                if ($isFirstSubAfterThreshold) {
+                    $adaptedPoints = $pointsGained - 2;
+                } else {
+                    $adaptedPoints = $pointsGained + 1;
+                }
 
-                    if ($prevRow['isPositive'] && $cumulativeSubDays >= $adaptedPoints * 30 && $overallUsedPoints >= 3) {
+                if ($prevRow['isPositive'] && $cumulativeSubDays >= $adaptedPoints * 30 && $overallUsedPoints >= 3) {
 //                echo("{$sub['username']}_sub_true $checkDay +1 point <br>");
+                    if ($givePoints) {
                         $this->dbConn->query("UPDATE subscriptions SET granted_point = TRUE WHERE user_twitch_id = {$sub['twitch_id']} AND DATE_FORMAT(check_date, '%Y-%m-%d') <= '$checkDay' AND granted_point = FALSE");
                         $this->dbConn->query("UPDATE users SET sub_points = sub_points + 1 WHERE twitch_id = {$sub['twitch_id']}");
-                        $row['event'] = '+1 поинт';
-                        $pointsGained++;
-                    } elseif ($prevRow['isPositive'] && $cumulativeSubDays > 0 && $overallUsedPoints < 3) {
+                    }
+                    $row['event'] = '+1 поинт';
+                    $pointsGained++;
+                } elseif ($prevRow['isPositive'] && $cumulativeSubDays > 0 && $overallUsedPoints < 3) {
+                    if ($givePoints) {
                         $this->dbConn->query("UPDATE subscriptions SET granted_point = TRUE WHERE user_twitch_id = {$sub['twitch_id']} AND DATE_FORMAT(check_date, '%Y-%m-%d') <= '$checkDay' AND granted_point = FALSE");
                     }
-
-                    $tableRows[$sub['username']][] = $row;
-                    $prevRow = $row;
                 }
 
-                usort($tableRows[$sub['username']], function($a, $b) {
-                    return $a['date'] < $b['date'] ? -1 : 1;
-                });
+                $tableRows[$sub['username']][] = $row;
+                $prevRow = $row;
             }
 
-            $pointsInfo = '<details>
-        <summary>Информация о подписках</summary>
-        <table>
-            <tr>
-                <th rowspan="2">Дата проверки</th>
-                <th colspan="2">Подписка</th>
-                <th rowspan="2">Событие</th>
-            </tr>
-            <tr>
-                <th>Стрик, дней</th>
-                <th>Всего, дней</th>
-            </tr>';
-            foreach ($tableRows as $username => $userTable) {
-                if (!array_key_exists($username, $drawUsers)) continue;
-                $pointsInfo .= "<tr>
-                <th colspan='3'>$username</th>
-            </tr>";
-                foreach ($userTable as $tableRow) {
-                    $pointsInfo .= "<tr>
-                <td>{$tableRow['date']}</td>
-                <td>{$tableRow['sub_streak']}</td>
-                <td>{$tableRow['sub_overall']}</td>
-                <td>{$tableRow['event']}</td>
-            </tr>";
-                }
-            }
-            $pointsInfo .= '</table></details>';
-
-            $this->request->setViewVariable('body', $pointsInfo);
+            usort($tableRows[$sub['username']], function ($a, $b) {
+                return $a['date'] < $b['date'] ? -1 : 1;
+            });
         }
+
+        $pointsInfo = '<details>
+                <summary>Информация о подписках</summary>
+                <table>
+                    <tr>
+                        <th rowspan="2">Дата проверки</th>
+                        <th colspan="2">Подписка</th>
+                        <th rowspan="2">Событие</th>
+                    </tr>
+                    <tr>
+                        <th>Стрик, дней</th>
+                        <th>Всего, дней</th>
+                    </tr>';
+        foreach ($tableRows as $username => $userTable) {
+            if (!array_key_exists($username, $drawUsers)) {
+                continue;
+            }
+            $pointsInfo .= "<tr>
+                        <th colspan='3'>$username</th>
+                    </tr>";
+            foreach ($userTable as $tableRow) {
+                $pointsInfo .= "<tr>
+                        <td>{$tableRow['date']}</td>
+                        <td>{$tableRow['sub_streak']}</td>
+                        <td>{$tableRow['sub_overall']}</td>
+                        <td>{$tableRow['event']}</td>
+                    </tr>";
+            }
+        }
+        $pointsInfo .= '</table></details>';
+
+        return $pointsInfo;
     }
 }

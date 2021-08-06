@@ -38,7 +38,7 @@ class wlrController extends baseController
 
         $this->request->setLayout('');
 
-        $moders = ["40955336", "82304594", "165373962", "59271050", "101009981", "50267699", "60632525", "84508869", "51198830"];
+        $moders = [(string) $this->coolGuy, (string) $this->kewlProgrammer, "165373962", "59271050", "101009981", "50267699", "60632525", "84508869", "51198830"];
 
         if (in_array($this->authInfo['id'], $moders)) {
             if (!empty($_POST)) {
