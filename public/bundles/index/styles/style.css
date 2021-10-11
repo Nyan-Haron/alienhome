@@ -73,6 +73,14 @@ body {
   background-repeat: no-repeat;
   background-size: contain;
 }
+.game.zombie {
+  background-color: #00F102;
+  background-image: url("/img/zombieWatermark.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-color: red;
+}
 
 /*============ tile styles ==============*/
 div.game {

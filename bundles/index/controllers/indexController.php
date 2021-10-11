@@ -116,7 +116,10 @@ class indexController extends baseController
 
                 $statusCode = $gameStatus['code'];
                 if ($game['is_revived']) $statusCode .= ' revived';
+                // GameShit ImFucked (ID 562)
+                if ($game['id'] == 562) $statusCode = ' zombie';
                 $games .= $this->request->renderLayout($gameTile, [
+                    'gameId' => $game['id'],
                     'statusCode' => $statusCode,
                     'ownage' => $ownage,
                     'gameDate' => date("Y-m-d", $game['order_date']),
