@@ -49,7 +49,7 @@ class indexController extends baseController
         $statusHistoryTableContent .= '<tr><td colspan="3">Показаны последние 100 записей. Ну очень много за эти годы скопилось</td></tr>';
         $this->request->setViewVariable('statusHistoryTableContent', $statusHistoryTableContent);
 
-        $games = $this->dbConn->query('SELECT games.id, games.title, games.comment, games.is_revived, users.twitch_id as author_id, users.username as author_name, UNIX_TIMESTAMP(games.order_date) AS order_date, games.poll_count, games.status_id, statuses.title AS status FROM games JOIN statuses ON (statuses.id = games.status_id) JOIN users on games.author_id = users.twitch_id ORDER BY statuses.`order` ASC, order_date DESC;');
+        $games = $this->dbConn->query('SELECT games.id, games.title, games.comment, games.is_revived, users.twitch_id as author_id, users.username as author_name, UNIX_TIMESTAMP(games.order_date) AS order_date, games.poll_count, games.is_zombie, games.status_id, statuses.title AS status FROM games JOIN statuses ON (statuses.id = games.status_id) JOIN users on games.author_id = users.twitch_id ORDER BY statuses.`order` ASC, order_date DESC;');
         $statuses = $this->dbConn->query("SELECT * FROM statuses;");
         $statusesArr = [];
         while ($statusId = $statuses->fetch_assoc()) {
@@ -116,8 +116,7 @@ class indexController extends baseController
 
                 $statusCode = $gameStatus['code'];
                 if ($game['is_revived']) $statusCode .= ' revived';
-                // GameShit ImFucked (ID 562)
-                if ($game['id'] == 562) $statusCode = ' zombie';
+                if ($game['is_zombie']) $statusCode = ' zombie';
                 $games .= $this->request->renderLayout($gameTile, [
                     'gameId' => $game['id'],
                     'statusCode' => $statusCode,
