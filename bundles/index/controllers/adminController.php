@@ -21,15 +21,15 @@ class adminController extends baseController
         if (isset($this->request->post['type']) && $this->request->post['type'] == "game") {
             $id = $this->dbConn->escape($this->request->post['id']);
             $title = $this->dbConn->escape($this->request->post['title']);
-            $overallSubDays = $this->dbConn->escape($this->request->post['status']);
+            $status = $this->dbConn->escape($this->request->post['status']);
             $comment = $this->dbConn->escape($this->request->post['comment']);
             $poll_count = $this->dbConn->escape($this->request->post['poll_count']);
             $votes_count = $this->dbConn->escape($this->request->post['votes_count']);
-            $is_zombie = $this->dbConn->escape($this->request->post['zombie']) ? 1 : 0;
+            $is_zombie = $this->dbConn->escape(isset($this->request->post['zombie']) ? 1 : 0);
             $oldGameState = $this->dbConn->query("SELECT * FROM games WHERE id = $id")->fetch_assoc();
-            if ($oldGameState['status_id'] != $overallSubDays) {
-                $this->dbConn->query("UPDATE games SET title = '$title', status_id = $overallSubDays, comment = '$comment', poll_count = $poll_count, votes = $votes_count, is_zombie = $is_zombie status_change_date = NOW() WHERE id = $id;");
-                $this->dbConn->query('INSERT INTO game_statuses_log (game, status_id, change_date) VALUES (' . $id . ', ' . $overallSubDays . ', NOW());');
+            if ($oldGameState['status_id'] != $status) {
+                $this->dbConn->query("UPDATE games SET title = '$title', status_id = $status, comment = '$comment', poll_count = $poll_count, votes = $votes_count, is_zombie = $is_zombie, status_change_date = NOW() WHERE id = $id;");
+                $this->dbConn->query('INSERT INTO game_statuses_log (game, status_id, change_date) VALUES (' . $id . ', ' . $status . ', NOW());');
             } else {
                 $this->dbConn->query("UPDATE games SET title = '$title', comment = '$comment', poll_count = $poll_count, votes = $votes_count, is_zombie = $is_zombie WHERE id = $id;");
             }
@@ -45,19 +45,19 @@ class adminController extends baseController
         if ((int) $_SESSION['id'] === $this->coolGuy || (int) $_SESSION['id'] === $this->kewlProgrammer || $_SESSION['id'] === "50267699") {
             $q = $this->dbConn->query("SELECT * FROM statuses");
             $statuses = [];
-            while ($overallSubDays = $q->fetch_assoc()) {
-                $statuses[$overallSubDays['id']] = $overallSubDays;
+            while ($status = $q->fetch_assoc()) {
+                $statuses[$status['id']] = $status;
             }
 
             $games = '';
             $r = $this->dbConn->query('SELECT games.* FROM games JOIN statuses ON (statuses.id = games.status_id) ORDER BY statuses.admin_order');
             while ($game = $r->fetch_assoc()) {
                 $statusSelect = '<select class="row" name="status">';
-                foreach ($statuses as $overallSubDays) {
-                    if ($overallSubDays['id'] == $game['status_id']) {
-                        $statusSelect .= '<option selected value="' . $overallSubDays['id'] . '">' . $overallSubDays['title'] . '</option>';
+                foreach ($statuses as $status) {
+                    if ($status['id'] == $game['status_id']) {
+                        $statusSelect .= '<option selected value="' . $status['id'] . '">' . $status['title'] . '</option>';
                     } else {
-                        $statusSelect .= '<option value="' . $overallSubDays['id'] . '">' . $overallSubDays['title'] . '</option>';
+                        $statusSelect .= '<option value="' . $status['id'] . '">' . $status['title'] . '</option>';
                     }
                 }
                 $statusSelect .= '</select>';
