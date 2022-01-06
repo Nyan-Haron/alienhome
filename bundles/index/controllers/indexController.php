@@ -122,23 +122,35 @@ class indexController extends baseController
 
                 // Subgame Event
                 if ($game['id'] == 562) {
-                    $game['order_date'] = 0;
-                    $game['author_name'] = '???';
+                    $games .= $this->request->renderLayout($gameTile, [
+                        'gameId' => $game['id'],
+                        'statusCode' => $statusCode,
+                        'ownage' => $ownage,
+                        'gameDate' => date("Y-m-d"),
+                        'pollCount' => $game['poll_count'],
+                        'title' => $game['title'],
+                        'authorName' => '???',
+                        'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
+                        'star' => $star,
+                        'boostButton' => $boostButton,
+                        'reviveButton' => $reviveButton
+                    ]);
+                } else {
+                    $games .= $this->request->renderLayout($gameTile, [
+                        'gameId' => $game['id'],
+                        'statusCode' => $statusCode,
+                        'ownage' => $ownage,
+                        'gameDate' => date("Y-m-d", $game['order_date']),
+                        'pollCount' => $game['poll_count'],
+                        'title' => $game['title'],
+                        'authorName' => $game['author_name'],
+                        'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
+                        'star' => $star,
+                        'boostButton' => $boostButton,
+                        'reviveButton' => $reviveButton
+                    ]);
                 }
 
-                $games .= $this->request->renderLayout($gameTile, [
-                    'gameId' => $game['id'],
-                    'statusCode' => $statusCode,
-                    'ownage' => $ownage,
-                    'gameDate' => date("Y-m-d", $game['order_date']),
-                    'pollCount' => $game['poll_count'],
-                    'title' => $game['title'],
-                    'authorName' => $game['author_name'],
-                    'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
-                    'star' => $star,
-                    'boostButton' => $boostButton,
-                    'reviveButton' => $reviveButton
-                ]);
             }
 
             $games .= '<div style="clear: both"></div></div></details>';
