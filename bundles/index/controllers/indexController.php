@@ -101,22 +101,31 @@ class indexController extends baseController
           <span class="starValue">' . $gameBoostsCounts[$game['title']] . '</span>
         </div>';
                 }
+
                 $boostButton = '';
-                if ($gameStatus['code'] == 'agree' && $pointsCount >= 1 && $maxBoost > $boostedGames) {
-                    $boostButton = '
-        <form class="boostButton" action="/boost_game" style="display: inline"><input name="game" value="' . $game['id'] . '" type="hidden"><input value="BOOST!" type="submit"></form>
-        <div style="clear: both"></div>';
-                }
+                // Subgame Event
+//                if ($gameStatus['code'] == 'agree' && $pointsCount >= 1 && $maxBoost > $boostedGames) {
+//                    $boostButton = '
+//        <form class="boostButton" action="/boost_game" style="display: inline"><input name="game" value="' . $game['id'] . '" type="hidden"><input value="BOOST!" type="submit"></form>
+//        <div style="clear: both"></div>';
+//                }
                 $reviveButton = '';
-                if ($gameStatus['code'] == 'disagree' && $pointsCount >= 2 && $game['is_revived'] == 0) {
-                    $reviveButton = '
-        <form class="boostButton" action="/revive_game" style="display: inline"><input name="game" value="' . $game['id'] . '" type="hidden"><input value="HEROES NEVER DIE!" type="submit"></form>
-        <div style="clear: both"></div>';
-                }
+//                if ($gameStatus['code'] == 'disagree' && $pointsCount >= 2 && $game['is_revived'] == 0) {
+//                    $reviveButton = '
+//        <form class="boostButton" action="/revive_game" style="display: inline"><input name="game" value="' . $game['id'] . '" type="hidden"><input value="HEROES NEVER DIE!" type="submit"></form>
+//        <div style="clear: both"></div>';
+//                }
 
                 $statusCode = $gameStatus['code'];
                 if ($game['is_revived']) $statusCode .= ' revived';
                 if ($game['is_zombie']) $statusCode = ' zombie';
+
+                // Subgame Event
+                if ($game['id'] == 562) {
+                    $game['order_date'] = 0;
+                    $game['author_name'] = '???';
+                }
+
                 $games .= $this->request->renderLayout($gameTile, [
                     'gameId' => $game['id'],
                     'statusCode' => $statusCode,
