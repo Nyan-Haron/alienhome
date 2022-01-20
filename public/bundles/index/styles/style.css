@@ -359,3 +359,17 @@ summary {
     border: 3px solid green;
     cursor: pointer;
 }
+
+#explosionImage {
+    display: block;
+    margin: auto;
+}
+#explosionCounter {
+    font-family: Furore;
+    font-size: 32px;
+    font-weight: lighter;
+    color: white;
+    position: absolute;
+    margin-left: 180px;
+    margin-top: -54px;
+}
