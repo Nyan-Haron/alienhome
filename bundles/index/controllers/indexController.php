@@ -242,4 +242,9 @@ class indexController extends baseController
         curl_close($gameCheck);
         echo json_encode($gameInfo);
     }
+
+    public function standBy()
+    {
+        $this->request->setLayout('<html><body style="margin: 0"></body><img src="/img/difficulties.jpg" width="100%"/></html>');
+    }
 }

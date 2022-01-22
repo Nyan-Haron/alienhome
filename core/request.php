@@ -29,6 +29,7 @@ class Request
         '/r6s_wlr/lose' => 'index/wlr/lose',
         '/r6s_wlr/moderate' => 'index/wlr/moderate',
         '/r6s_wlr/win' => 'index/wlr/win',
+        '/stand_by' => 'index/index/standBy',
         '/titles' => 'index/titles/index'
     ];
 
