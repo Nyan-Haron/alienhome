@@ -70,10 +70,6 @@ class indexController extends baseController
         $boostedGames = 0;
         while ($game = $games->fetch_assoc()) {
             $gamesArr[$game['status_id']][] = $game;
-            if ($game['status_id'] === '5') {
-                $game['status_id'] = '7';
-                $gamesArr[$game['status_id']][] = $game;
-            }
             if ($statusesArr[$game['status_id']]['code'] == 'boost') $boostedGames++;
         }
 
