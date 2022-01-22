@@ -1,4 +1,5 @@
-let explosionDate = new Date(2022, 0, 22, 22, 1, 22);
+let explosionDate = new Date();
+explosionDate.setTime(1642878082000);
 let interval = setInterval(function() {
     let now = new Date();
     let diff = Math.floor((explosionDate.getTime() - now.getTime()) / 1000);
