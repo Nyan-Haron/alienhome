@@ -117,19 +117,36 @@ class indexController extends baseController
 
                 $statusCode = $gameStatus['code'];
                 if ($game['is_revived']) $statusCode .= ' revived';
-                $games .= $this->request->renderLayout($gameTile, [
-                    'statusCode' => $statusCode,
-                    'ownage' => $ownage,
-                    'gameDate' => date("Y-m-d", $game['order_date']),
-                    'pollCount' => $game['poll_count'],
-                    'title' => $game['title'],
-                    'authorName' => $game['author_name'],
-                    'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
-                    'star' => $star,
-                    'boostButton' => $boostButton,
-                    'reviveButton' => $reviveButton
-                ]);
-            }
+                // GameShit ImFucked, началось на Subgame Event
+                if ($game['id'] == 562) {
+                    $games .= $this->request->renderLayout($gameTile, [
+                        'gameId' => $game['id'],
+                        'statusCode' => $statusCode,
+                        'ownage' => $ownage,
+                        'gameDate' => date("Y-m-d"),
+                        'pollCount' => $game['poll_count'],
+                        'title' => $game['title'],
+                        'authorName' => '???',
+                        'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
+                        'star' => $star,
+                        'boostButton' => $boostButton,
+                        'reviveButton' => $reviveButton
+                    ]);
+                } else {
+                    $games .= $this->request->renderLayout($gameTile, [
+                        'gameId' => $game['id'],
+                        'statusCode' => $statusCode,
+                        'ownage' => $ownage,
+                        'gameDate' => date("Y-m-d", $game['order_date']),
+                        'pollCount' => $game['poll_count'],
+                        'title' => $game['title'],
+                        'authorName' => $game['author_name'],
+                        'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
+                        'star' => $star,
+                        'boostButton' => $boostButton,
+                        'reviveButton' => $reviveButton
+                    ]);
+                }            }
 
             $games .= '<div style="clear: both"></div></div></details>';
         }
