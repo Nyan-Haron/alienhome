@@ -1,19 +1,14 @@
-<div class="gameEditBlock">
-    <form method="post">
+<form method="post">
+    <div class="gameEditBlock">
         <span>ID: {{gameId}}<input name="id" value="{{gameId}}" type="hidden"></span>
-        <input class="row" name="title" placeholder="Название" value="{{gameTitle}}" type="text">
+        <input name="title" placeholder="Название" value="{{gameTitle}}" type="text">
         {{statusSelector}}
-        <textarea class="row" name="comment" placeholder="Коммент" type="text" maxlength="200">{{gameComment}}</textarea>
-        <div class="row">
-            В голосовании:
-            <input class="rightInput" name="poll_count" value="{{gamePollCount}}" type="number">
-        </div>
-        <div class="row">
-            Голосов:
-            <input class="rightInput" name="votes_count" value="{{gameVotes}}" type="number">
-        </div>
-        <label class="row"><input type="checkbox" name="zombie" {{gameIsZombie}}> Зомби</label>
+        <textarea name="comment" placeholder="Коммент" type="text" maxlength="200">{{gameComment}}</textarea>
+        <input name="poll_count" placeholder="Предлагали в голосовании" value="{{gamePollCount}}" type="number">
+        <input name="votes_count" placeholder="Набрала голосов" value="{{gameVotes}}" type="number">
         <input name="type" value="game" type="hidden">
-        <input class="row" value="Save" type="submit">
-    </form>
-</div>
+        <div class="saveButton">
+            <input value="Save" type="submit">
+        </div>
+    </div>
+</form>

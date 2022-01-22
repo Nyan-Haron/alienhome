@@ -41,15 +41,15 @@ class indexController extends baseController
         }
 
 
-        $s = $this->dbConn->query("SELECT g.title AS game, s.title AS status, s.code AS status_code, DATE_FORMAT(gsl.change_date, '%d-%m-%Y') AS change_date FROM game_statuses_log AS gsl JOIN games AS g ON g.id = gsl.game JOIN statuses AS s ON gsl.status_id = s.id ORDER BY gsl.change_date DESC LIMIT 100");
+        $s = $this->dbConn->query("SELECT g.title AS game, s.title AS status, s.code AS status_code, DATE_FORMAT(gsl.change_date, '%d-%m-%Y') AS change_date FROM game_statuses_log AS gsl JOIN games AS g ON g.id = gsl.game JOIN statuses AS s ON gsl.status_id = s.id WHERE gsl.do_show = TRUE ORDER BY gsl.change_date DESC LIMIT 100");
         $statusHistoryTableContent = '';
         while ($statusHistoryRecord = $s->fetch_assoc()) {
             $statusHistoryTableContent .= '<tr class="'.$statusHistoryRecord['status_code'].'"><td>' . $statusHistoryRecord['game'] . '</td><td>Перенесено в "' . $statusHistoryRecord['status'] . '"</td><td>' . $statusHistoryRecord['change_date'] . '</td></tr>';
         }
-        $statusHistoryTableContent .= '<tr><td colspan="3">Показаны последние 100 записей. Ну очень много за эти годы скопилось</td></tr>';
+//        $statusHistoryTableContent .= '<tr><td colspan="3">Показаны последние 100 записей. Ну очень много за эти годы скопилось</td></tr>';
         $this->request->setViewVariable('statusHistoryTableContent', $statusHistoryTableContent);
 
-        $games = $this->dbConn->query('SELECT games.id, games.title, games.comment, games.is_revived, users.twitch_id as author_id, users.username as author_name, UNIX_TIMESTAMP(games.order_date) AS order_date, games.poll_count, games.is_zombie, games.status_id, statuses.title AS status FROM games JOIN statuses ON (statuses.id = games.status_id) JOIN users on games.author_id = users.twitch_id ORDER BY statuses.`order` ASC, order_date DESC;');
+        $games = $this->dbConn->query('SELECT games.id, games.title, games.comment, games.is_revived, users.twitch_id as author_id, users.username as author_name, UNIX_TIMESTAMP(games.order_date) AS order_date, games.poll_count, games.status_id, statuses.title AS status FROM games JOIN statuses ON (statuses.id = games.status_id) JOIN users on games.author_id = users.twitch_id ORDER BY statuses.`order` ASC, order_date DESC;');
         $statuses = $this->dbConn->query("SELECT * FROM statuses;");
         $statusesArr = [];
         while ($statusId = $statuses->fetch_assoc()) {
@@ -70,6 +70,10 @@ class indexController extends baseController
         $boostedGames = 0;
         while ($game = $games->fetch_assoc()) {
             $gamesArr[$game['status_id']][] = $game;
+            if ($game['status_id'] === '5') {
+                $game['status_id'] = '7';
+                $gamesArr[$game['status_id']][] = $game;
+            }
             if ($statusesArr[$game['status_id']]['code'] == 'boost') $boostedGames++;
         }
 
@@ -97,60 +101,38 @@ class indexController extends baseController
                 $star = '';
                 if (isset($gameBoostsCounts[$game['title']])) {
                     $star = '<div class="starNvalue">
-          <img class="star" src="/img/starIconBlack.png" alt="(boost star)">
+          <img class="star" src="/img/starIconBlackShadow.png" alt="(boost star)">
           <span class="starValue">' . $gameBoostsCounts[$game['title']] . '</span>
         </div>';
                 }
 
                 $boostButton = '';
-                // Subgame Event
-//                if ($gameStatus['code'] == 'agree' && $pointsCount >= 1 && $maxBoost > $boostedGames) {
-//                    $boostButton = '
-//        <form class="boostButton" action="/boost_game" style="display: inline"><input name="game" value="' . $game['id'] . '" type="hidden"><input value="BOOST!" type="submit"></form>
-//        <div style="clear: both"></div>';
-//                }
+                if ($gameStatus['code'] == 'agree' && $pointsCount >= 1 && $maxBoost > $boostedGames) {
+                    $boostButton = '
+        <form class="boostButton" action="/boost_game" style="display: inline"><input name="game" value="' . $game['id'] . '" type="hidden"><input value="BOOST!" type="submit"></form>
+        <div style="clear: both"></div>';
+                }
                 $reviveButton = '';
-//                if ($gameStatus['code'] == 'disagree' && $pointsCount >= 2 && $game['is_revived'] == 0) {
-//                    $reviveButton = '
-//        <form class="boostButton" action="/revive_game" style="display: inline"><input name="game" value="' . $game['id'] . '" type="hidden"><input value="HEROES NEVER DIE!" type="submit"></form>
-//        <div style="clear: both"></div>';
-//                }
+                if ($gameStatus['code'] == 'disagree' && $pointsCount >= 2 && $game['is_revived'] == 0) {
+                    $reviveButton = '
+        <form class="boostButton" action="/revive_game" style="display: inline"><input name="game" value="' . $game['id'] . '" type="hidden"><input value="HEROES NEVER DIE!" type="submit"></form>
+        <div style="clear: both"></div>';
+                }
 
                 $statusCode = $gameStatus['code'];
                 if ($game['is_revived']) $statusCode .= ' revived';
-                if ($game['is_zombie']) $statusCode = ' zombie';
-
-                // Subgame Event
-                if ($game['id'] == 562) {
-                    $games .= $this->request->renderLayout($gameTile, [
-                        'gameId' => $game['id'],
-                        'statusCode' => $statusCode,
-                        'ownage' => $ownage,
-                        'gameDate' => date("Y-m-d"),
-                        'pollCount' => $game['poll_count'],
-                        'title' => $game['title'],
-                        'authorName' => '???',
-                        'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
-                        'star' => $star,
-                        'boostButton' => $boostButton,
-                        'reviveButton' => $reviveButton
-                    ]);
-                } else {
-                    $games .= $this->request->renderLayout($gameTile, [
-                        'gameId' => $game['id'],
-                        'statusCode' => $statusCode,
-                        'ownage' => $ownage,
-                        'gameDate' => date("Y-m-d", $game['order_date']),
-                        'pollCount' => $game['poll_count'],
-                        'title' => $game['title'],
-                        'authorName' => $game['author_name'],
-                        'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
-                        'star' => $star,
-                        'boostButton' => $boostButton,
-                        'reviveButton' => $reviveButton
-                    ]);
-                }
-
+                $games .= $this->request->renderLayout($gameTile, [
+                    'statusCode' => $statusCode,
+                    'ownage' => $ownage,
+                    'gameDate' => date("Y-m-d", $game['order_date']),
+                    'pollCount' => $game['poll_count'],
+                    'title' => $game['title'],
+                    'authorName' => $game['author_name'],
+                    'comment' => (strlen($game['comment']) > 200 ? mb_substr($game['comment'], 0, 197) . '...' : $game['comment']),
+                    'star' => $star,
+                    'boostButton' => $boostButton,
+                    'reviveButton' => $reviveButton
+                ]);
             }
 
             $games .= '<div style="clear: both"></div></div></details>';
@@ -241,10 +223,5 @@ class indexController extends baseController
         $gameInfo = json_decode(curl_exec($gameCheck), true);
         curl_close($gameCheck);
         echo json_encode($gameInfo);
-    }
-
-    public function standBy()
-    {
-        $this->request->setLayout('<html><body style="margin: 0"></body><img src="/img/difficulties.jpg" width="100%"/></html>');
     }
 }

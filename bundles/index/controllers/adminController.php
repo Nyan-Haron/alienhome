@@ -25,13 +25,12 @@ class adminController extends baseController
             $comment = $this->dbConn->escape($this->request->post['comment']);
             $poll_count = $this->dbConn->escape($this->request->post['poll_count']);
             $votes_count = $this->dbConn->escape($this->request->post['votes_count']);
-            $is_zombie = $this->dbConn->escape(isset($this->request->post['zombie']) ? 1 : 0);
             $oldGameState = $this->dbConn->query("SELECT * FROM games WHERE id = $id")->fetch_assoc();
             if ($oldGameState['status_id'] != $status) {
-                $this->dbConn->query("UPDATE games SET title = '$title', status_id = $status, comment = '$comment', poll_count = $poll_count, votes = $votes_count, is_zombie = $is_zombie, status_change_date = NOW() WHERE id = $id;");
+                $this->dbConn->query("UPDATE games SET title = '$title', status_id = $status, comment = '$comment', poll_count = $poll_count, votes = $votes_count, status_change_date = NOW() WHERE id = $id;");
                 $this->dbConn->query('INSERT INTO game_statuses_log (game, status_id, change_date) VALUES (' . $id . ', ' . $status . ', NOW());');
             } else {
-                $this->dbConn->query("UPDATE games SET title = '$title', comment = '$comment', poll_count = $poll_count, votes = $votes_count, is_zombie = $is_zombie WHERE id = $id;");
+                $this->dbConn->query("UPDATE games SET title = '$title', comment = '$comment', poll_count = $poll_count, votes = $votes_count WHERE id = $id;");
             }
         } else {
             if (isset($this->request->post['type']) && $this->request->post['type'] == "link") {
@@ -69,7 +68,6 @@ class adminController extends baseController
                     'gameComment' => $game['comment'],
                     'gamePollCount' => $game['poll_count'],
                     'gameVotes' => $game['votes'],
-                    'gameIsZombie' => $game['is_zombie'] ? 'checked' : '',
                     'statusSelector' => $statusSelect
                 ]);
             }

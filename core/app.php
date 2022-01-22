@@ -46,10 +46,6 @@ class App
         /** @var baseController $controller */
         $controller = new $controllerName($db, $request, $conf);
 
-        if ($request->method !== 'standBy') {
-            header('Location: /stand_by');
-        }
-
         if (!$controller->checkAuth() && $request->controller !== 'auth' && $request->needAuth) {
             header("Location: /login");
         }
